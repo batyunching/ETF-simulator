@@ -477,7 +477,7 @@
                     </div>
 
                     <!-- 圖例列 -->
-                    <div id="legendPriceMode" class="flex flex-wrap items-center gap-4 text-xs">
+                    <div id="legendPriceMode" class="flex flex-wrap items-center gap-3 sm:gap-4 text-xs">
                         <span class="flex items-center gap-1.5 font-semibold text-slate-700">
                             <span class="w-3 h-3 rounded-full bg-blue-600 inline-block"></span><span id="legendPriceEtfName">0050 市場股價</span>
                         </span>
@@ -491,9 +491,19 @@
                         <span class="flex items-center gap-1.5 font-bold text-emerald-700">
                             <span class="w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-emerald-200 inline-block"></span>正式回本交叉點
                         </span>
+                        <span class="hidden sm:inline text-slate-300">|</span>
+                        <span class="flex items-center gap-1 text-[11px] font-medium text-slate-600">
+                            <span class="w-2.5 h-2.5 rounded-xs bg-rose-200/80 border border-rose-300 inline-block"></span>階段一底色
+                        </span>
+                        <span class="flex items-center gap-1 text-[11px] font-medium text-slate-600">
+                            <span class="w-2.5 h-2.5 rounded-xs bg-emerald-200/80 border border-emerald-300 inline-block"></span>階段二底色
+                        </span>
+                        <span class="flex items-center gap-1 text-[11px] font-medium text-slate-600">
+                            <span class="w-2.5 h-2.5 rounded-xs bg-blue-200/80 border border-blue-300 inline-block"></span>階段三底色
+                        </span>
                     </div>
 
-                    <div id="legendAssetMode" class="hidden flex flex-wrap items-center gap-4 text-xs">
+                    <div id="legendAssetMode" class="hidden flex flex-wrap items-center gap-3 sm:gap-4 text-xs">
                         <span class="flex items-center gap-1.5 font-semibold text-slate-700">
                             <span class="w-3 h-3 rounded-sm bg-emerald-500 inline-block"></span>目前策略帳面總市值
                         </span>
@@ -503,6 +513,16 @@
                         <span id="legendBaseAssetItem" class="hidden flex items-center gap-1.5 font-medium text-blue-600">
                             <span class="w-3.5 h-0.5 border-t-2 border-dotted border-blue-500 inline-block"></span>純定期定額總市值(對照)
                         </span>
+                        <span class="hidden sm:inline text-slate-300">|</span>
+                        <span class="flex items-center gap-1 text-[11px] font-medium text-slate-600">
+                            <span class="w-2.5 h-2.5 rounded-xs bg-rose-200/80 border border-rose-300 inline-block"></span>階段一
+                        </span>
+                        <span class="flex items-center gap-1 text-[11px] font-medium text-slate-600">
+                            <span class="w-2.5 h-2.5 rounded-xs bg-emerald-200/80 border border-emerald-300 inline-block"></span>階段二
+                        </span>
+                        <span class="flex items-center gap-1 text-[11px] font-medium text-slate-600">
+                            <span class="w-2.5 h-2.5 rounded-xs bg-blue-200/80 border border-blue-300 inline-block"></span>階段三
+                        </span>
                     </div>
 
                     <!-- 圖表畫布 -->
@@ -510,19 +530,28 @@
                         <canvas id="mainSimChart"></canvas>
                     </div>
 
-                    <!-- 三階段微笑曲線里程碑摘要列 -->
+                    <!-- 三階段微笑曲線里程碑摘要列（與上方圖表背景色塊 100% 顏色對齊） -->
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-100 text-xs">
-                        <div class="p-2.5 rounded-xl bg-rose-50/70 border border-rose-100">
-                            <div class="font-bold text-rose-800">階段一：空頭築底期</div>
-                            <div id="milestonePhase1" class="text-slate-600 mt-0.5">第 1～8 月下跌 -30%，低檔累積大量便宜零股</div>
+                        <div class="p-3 rounded-xl bg-rose-50/90 border border-rose-200 shadow-2xs">
+                            <div class="font-extrabold text-rose-800 flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block shrink-0"></span>
+                                階段一：空頭築底期
+                            </div>
+                            <div id="milestonePhase1" class="text-slate-700 mt-1 leading-relaxed">第 1～8 月下跌 -30%，低檔累積大量便宜零股</div>
                         </div>
-                        <div class="p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-100">
-                            <div class="font-bold text-emerald-800">階段二：黃金交叉回本</div>
-                            <div id="milestonePhase2" class="text-slate-600 mt-0.5">第 15 個月正式回本轉正，比大盤提前 9 個月</div>
+                        <div class="p-3 rounded-xl bg-emerald-50/90 border border-emerald-200 shadow-2xs">
+                            <div class="font-extrabold text-emerald-800 flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block shrink-0"></span>
+                                階段二：反彈至黃金交叉回本
+                            </div>
+                            <div id="milestonePhase2" class="text-slate-700 mt-1 leading-relaxed">第 9～15 月反彈攤平，第 15 個月正式回本轉正</div>
                         </div>
-                        <div class="p-2.5 rounded-xl bg-blue-50/70 border border-blue-100">
-                            <div class="font-bold text-blue-900">階段三：重返前高收割</div>
-                            <div id="milestonePhase3" class="text-slate-600 mt-0.5">第 24 個月大盤回前高，累積報酬率達 +21.5%</div>
+                        <div class="p-3 rounded-xl bg-blue-50/90 border border-blue-200 shadow-2xs">
+                            <div class="font-extrabold text-blue-900 flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block shrink-0"></span>
+                                階段三：獲利重返前高收割
+                            </div>
+                            <div id="milestonePhase3" class="text-slate-700 mt-1 leading-relaxed">第 16～24 月獲利擴大，重返前高報酬率達 +21.5%</div>
                         </div>
                     </div>
                 </div>
@@ -971,98 +1000,95 @@
 
             if (isStopDcaMode) {
                 const delayMonths = Math.max(0, activeSim.breakevenMonth - baseSim.breakevenMonth);
-                const lostProfit = Math.max(0, baseSim.recoveryRecord.profit - activeSim.recoveryRecord.profit);
+                const profitDiff = recoveryRecord.profit - baseSim.recoveryRecord.profit;
                 els.insightSummaryText.innerHTML = `
-                    <strong class="text-amber-300">⚠️ 恐慌停扣警示（${profile.code} ${profile.name}）：</strong>當跌幅超過 20% 時停止扣款（共停扣 <strong class="text-rose-200">${pausedMonthsCount} 個月</strong>），導致平均成本停滯在 <strong class="text-rose-200">${fmtDec(lowestAvgCost, 2)} 元</strong> 無法向下攤平！
-                    相較純定期定額，恐慌停扣導致回本時間<strong class="text-amber-300 underline decoration-amber-400 decoration-2 underline-offset-2">延後了 ${delayMonths} 個月（從第 ${baseSim.breakevenMonth} 個月拖延至第 ${activeSim.breakevenMonth} 個月）</strong>，回前高時總獲利<strong class="text-rose-200">少賺了 NT$ ${fmtInt(lostProfit)} 元</strong>！
+                    <strong class="text-rose-300">⚠️ 恐慌停扣警示：</strong>當 ${profile.code} 跌幅超過 20% 時停止扣款（共停扣 <strong>${pausedMonthsCount} 個月</strong>），雖然少投入了資金，卻錯失在谷底 <strong>${fmtDec(bottomPrice, 2)} 元</strong> 累積便宜零股的黃金期！平均成本卡在 <strong>${fmtDec(lowestAvgCost, 2)} 元</strong> 無法攤平，回本時間拖延至 <strong class="text-amber-300 underline decoration-rose-400">第 ${breakevenMonth} 個月</strong>（比持續定期定額晚了 <strong>${delayMonths} 個月</strong>）。
                 `;
+                els.compareTag.textContent = '停扣代價警示';
+                els.compareTag.className = 'px-1.5 py-0.5 rounded bg-rose-500/40 text-rose-100 text-[10px] font-bold';
+                els.compareBreakevenVal.textContent = `第 ${breakevenMonth} 個月`;
+                els.compareBreakevenVal.className = 'text-sm sm:text-base font-extrabold text-rose-300 mt-0.5';
+                els.compareBreakevenSub.textContent = delayMonths > 0 ? `比持續扣款晚 ${delayMonths} 個月回本` : '與基準同月回本（跌幅未逾20%）';
+                els.compareBreakevenSub.className = 'text-[11px] text-rose-200';
+                els.compareProfitVal.textContent = `${profitDiff >= 0 ? '+' : ''}NT$ ${fmtInt(profitDiff)}`;
+                els.compareProfitVal.className = 'text-sm sm:text-base font-extrabold text-rose-300 mt-0.5';
+                els.compareProfitSub.textContent = `回前高少賺 ${fmtInt(Math.abs(profitDiff))} 元`;
+            } else if (isCompareMode) {
+                const savedMonths = Math.max(0, baseSim.breakevenMonth - activeSim.breakevenMonth);
+                const profitDiff = recoveryRecord.profit - baseSim.recoveryRecord.profit;
+                els.insightSummaryText.innerHTML = `
+                    在 ${profile.code}（起始 <strong>${state.startPrice} 元</strong>）下跌 <strong>-${state.maxDrop}%</strong> 至谷底 <strong>${fmtDec(bottomPrice, 2)} 元</strong> 期間執行 <strong>${strategyMeta[state.strategy].shortName}</strong>，平均成本最低壓至 <strong>${fmtDec(lowestAvgCost, 2)} 元</strong>。只要市價從谷底反彈 <strong>+${reboundFromBottomPct}%</strong>（距前高仍差 <strong>${stillBelowPeakPct}%</strong>），<strong class="text-amber-300 underline decoration-amber-400">第 ${breakevenMonth} 個月</strong>即正式回本！
+                `;
+                els.compareTag.textContent = '加碼加速對照';
+                els.compareTag.className = 'px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-200 text-[10px] font-bold';
+                els.compareBreakevenVal.textContent = `第 ${breakevenMonth} 個月`;
+                els.compareBreakevenVal.className = 'text-sm sm:text-base font-extrabold text-amber-300 mt-0.5';
+                els.compareBreakevenSub.textContent = savedMonths > 0 ? `比純定期定額再提前 ${savedMonths} 個月` : '與純定期定額同月回本';
+                els.compareBreakevenSub.className = 'text-[11px] text-emerald-300';
+                els.compareProfitVal.textContent = `+NT$ ${fmtInt(Math.max(0, profitDiff))}`;
+                els.compareProfitVal.className = 'text-sm sm:text-base font-extrabold text-emerald-400 mt-0.5';
+                els.compareProfitSub.textContent = '回前高總獲利放大差額';
             } else {
                 els.insightSummaryText.innerHTML = `
-                    在 <strong class="text-emerald-300">${profile.code} (${profile.name})</strong> 從 <strong class="text-white">${state.startPrice} 元</strong>下跌 <strong class="text-rose-300">-${state.maxDrop}%</strong>（谷底 <strong class="text-rose-300">${fmtDec(bottomPrice, 2)} 元</strong>）的情境下，透過紀律扣款與${profile.freqLabel}再投入使平均成本最低降至 <strong class="text-amber-300">${fmtDec(lowestAvgCost, 2)} 元</strong>。
-                    股價僅需從底部反彈 <strong class="text-emerald-300">+${reboundFromBottomPct}%</strong>（距前高仍差 ${stillBelowPeakPct}%），於 <strong class="text-emerald-300 underline decoration-emerald-400 decoration-2 underline-offset-2">第 ${breakevenMonth} 個月</strong>即全數回本！至第 ${state.recoveryMonth} 個月重返前高時，總獲利達 <strong class="text-emerald-300">+NT$ ${fmtInt(recoveryRecord.profit)} (+${fmtDec(recoveryRecord.roiPct, 1)}%)</strong>。
+                    即使在最高點（<strong>${state.startPrice} 元</strong>）開始定期定額買進 ${profile.code}，遭遇 <strong>-${state.maxDrop}%</strong> 股災跌至 <strong>${fmtDec(bottomPrice, 2)} 元</strong>，透過低檔持續累積零股，平均持有成本最低降至 <strong>${fmtDec(lowestAvgCost, 2)} 元</strong>。只要市價從谷底反彈 <strong>+${reboundFromBottomPct}%</strong>（距前高仍差 <strong>${stillBelowPeakPct}%</strong>），<strong class="text-emerald-300 underline decoration-emerald-400">第 ${breakevenMonth} 個月</strong>便全數回本！
                 `;
-            }
-
-            // 2. 更新雙軌對照卡片（純定期定額 vs 目前選定策略）
-            if (!isCompareMode) {
                 els.compareTag.textContent = '基準對照';
                 els.compareTag.className = 'px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-200 text-[10px]';
-                els.compareBreakevenVal.textContent = `第 ${baseSim.breakevenMonth} 個月回本`;
-                els.compareBreakevenSub.textContent = `比指數回高提前 ${Math.max(0, state.recoveryMonth - baseSim.breakevenMonth)} 個月`;
-                els.compareProfitVal.textContent = `+NT$ ${fmtInt(baseSim.recoveryRecord.profit)}`;
+                els.compareBreakevenVal.textContent = `第 ${breakevenMonth} 個月`;
+                els.compareBreakevenVal.className = 'text-sm sm:text-base font-extrabold text-white mt-0.5';
+                els.compareBreakevenSub.textContent = '基準無加碼模式';
+                els.compareBreakevenSub.className = 'text-[11px] text-emerald-300';
+                els.compareProfitVal.textContent = 'NT$ 0';
                 els.compareProfitVal.className = 'text-sm sm:text-base font-extrabold text-emerald-400 mt-0.5';
-                els.compareProfitSub.textContent = '切換左側 B~E 比較不同策略效果';
-            } else if (isStopDcaMode) {
-                const delayMonths = activeSim.breakevenMonth - baseSim.breakevenMonth;
-                const lostProfit = activeSim.recoveryRecord.profit - baseSim.recoveryRecord.profit; // 負值
-                els.compareTag.textContent = '⚠️ 停扣代價警示';
-                els.compareTag.className = 'px-1.5 py-0.5 rounded bg-rose-500 text-white text-[10px] font-extrabold';
-                els.compareBreakevenVal.textContent = delayMonths > 0
-                    ? `延後 ${delayMonths} 個月才回本！`
-                    : `第 ${activeSim.breakevenMonth} 個月回本`;
-                els.compareBreakevenSub.textContent = `第 ${activeSim.breakevenMonth} 個月 vs 純定額第 ${baseSim.breakevenMonth} 個月`;
-                els.compareProfitVal.textContent = `-NT$ ${fmtInt(Math.abs(lostProfit))}`;
-                els.compareProfitVal.className = 'text-sm sm:text-base font-extrabold text-rose-300 mt-0.5';
-                els.compareProfitSub.textContent = `回前高總獲利大幅縮水（僅賺 ${fmtInt(activeSim.recoveryRecord.profit)} 元）`;
-            } else {
-                const monthsEarlier = baseSim.breakevenMonth - activeSim.breakevenMonth;
-                const extraProfit = activeSim.recoveryRecord.profit - baseSim.recoveryRecord.profit;
-
-                els.compareTag.textContent = '加碼加速效果';
-                els.compareTag.className = 'px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-200 text-[10px]';
-                if (monthsEarlier > 0) {
-                    els.compareBreakevenVal.textContent = `再提前 ${monthsEarlier} 個月回本！`;
-                } else {
-                    els.compareBreakevenVal.textContent = `第 ${activeSim.breakevenMonth} 個月回本`;
-                }
-                els.compareBreakevenSub.textContent = `第 ${activeSim.breakevenMonth} 個月 vs 純定額第 ${baseSim.breakevenMonth} 個月`;
-
-                const profitSign = extraProfit >= 0 ? '+' : '';
-                els.compareProfitVal.textContent = `${profitSign}NT$ ${fmtInt(extraProfit)}`;
-                els.compareProfitVal.className = 'text-sm sm:text-base font-extrabold text-emerald-400 mt-0.5';
-                els.compareProfitSub.textContent = `回前高總獲利增加（總賺 ${fmtInt(activeSim.recoveryRecord.profit)} 元）`;
+                els.compareProfitSub.textContent = '切換 B/C/D/E 查看策略差異';
             }
 
-            // 3. 更新四大核心指標 KPI 卡片
-            // KPI 1
-            els.kpiBreakevenMonth.textContent = `第 ${breakevenMonth} 個月`;
-            els.kpiBreakevenPrice.textContent = `(市價 ${fmtDec(beRecord.price, 2)}元)`;
+            // 2. 更新四大 KPI 卡片數據
             const savedMonthsVsIndex = state.recoveryMonth - breakevenMonth;
-            els.kpiBreakevenDiff.textContent = savedMonthsVsIndex > 0
-                ? `⚡ 比大盤回前高提前 ${savedMonthsVsIndex} 個月`
-                : `與大盤同步於第 ${breakevenMonth} 個月回本`;
+            els.kpiBreakevenMonth.textContent = `第 ${breakevenMonth} 個月`;
+            els.kpiBreakevenMonth.className = isStopDcaMode ? 'text-2xl font-black text-rose-600' : 'text-2xl font-black text-emerald-600';
+            els.kpiBreakevenPrice.textContent = `(市價 ${fmtDec(beRecord.price, 2)}元)`;
+            if (savedMonthsVsIndex > 0) {
+                els.kpiBreakevenDiff.textContent = `⚡ 比大盤回高提前 ${savedMonthsVsIndex} 個月`;
+                els.kpiBreakevenDiff.className = 'inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md';
+            } else {
+                els.kpiBreakevenDiff.textContent = `與大盤回高同步於第 ${breakevenMonth} 個月回本`;
+                els.kpiBreakevenDiff.className = 'inline-flex items-center gap-1 text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md';
+            }
 
-            // KPI 2
-            const discountFold = Math.round((lowestAvgCost / state.startPrice) * 100);
+            const costFold = Math.round((lowestAvgCost / state.startPrice) * 100);
             els.kpiLowestAvgCost.textContent = `${fmtDec(lowestAvgCost, 2)} 元`;
-            els.kpiCostDiscount.textContent = `約 ${discountFold} 折`;
+            els.kpiCostDiscount.textContent = `約 ${costFold} 折`;
             els.kpiLowestCostMonth.textContent = `第 ${lowestAvgCostMonth} 個月最低`;
             els.kpiBottomPriceHint.textContent = `谷底 ${fmtDec(bottomPrice, 2)}元`;
 
-            // KPI 3
-            const basePrincipal = state.monthlyAmount * state.recoveryMonth;
-            const principalDiff = recoveryRecord.cumPrincipal - basePrincipal;
-            els.kpiPrincipalTitle.textContent = `3. 第 ${state.recoveryMonth} 月總投入本金`;
+            els.kpiPrincipalTitle.textContent = `3. 第 ${state.recoveryMonth} 月回高總本金`;
             els.kpiTotalPrincipal.textContent = `NT$ ${fmtInt(recoveryRecord.cumPrincipal)}`;
-            if (principalDiff > 0) {
-                els.kpiBoostExtraInfo.textContent = `含低檔加碼 +${fmtInt(principalDiff)}`;
-            } else if (principalDiff < 0) {
-                els.kpiBoostExtraInfo.textContent = `停扣少投入 -${fmtInt(Math.abs(principalDiff))}`;
+            const basePrincipalAtRecovery = baseSim.recoveryRecord.cumPrincipal;
+            const principalDiff = recoveryRecord.cumPrincipal - basePrincipalAtRecovery;
+            if (isStopDcaMode) {
+                els.kpiBoostExtraInfo.textContent = `停扣少投 ${fmtInt(Math.abs(principalDiff))} 元`;
+                els.kpiBoostExtraInfo.className = 'text-rose-600 font-bold';
+            } else if (principalDiff > 0) {
+                els.kpiBoostExtraInfo.textContent = `含低檔加碼 +${fmtInt(principalDiff)} 元`;
+                els.kpiBoostExtraInfo.className = 'text-amber-700 font-bold';
             } else {
-                els.kpiBoostExtraInfo.textContent = `純定期定額累積本金`;
+                els.kpiBoostExtraInfo.textContent = '純定期定額本金';
+                els.kpiBoostExtraInfo.className = 'text-slate-500';
             }
-            els.kpiTotalSharesHint.textContent = `${fmtDec(recoveryRecord.cumShares, 2)} 股`;
+            els.kpiTotalSharesHint.textContent = `${fmtDec(recoveryRecord.cumShares, 1)} 股`;
 
-            // KPI 4
-            els.kpiRecoveryTitle.textContent = `4. 第 ${state.recoveryMonth} 月帳面總市值`;
+            els.kpiRecoveryTitle.textContent = `4. 第 ${state.recoveryMonth} 月回高總市值`;
             els.kpiRecoveryValue.textContent = `NT$ ${fmtInt(recoveryRecord.marketValue)}`;
-            const pSign = recoveryRecord.profit >= 0 ? '+' : '';
-            els.kpiRecoveryProfit.textContent = `${pSign}${fmtInt(recoveryRecord.profit)} (${pSign}${fmtDec(recoveryRecord.roiPct, 1)}%)`;
+            const profitSign = recoveryRecord.profit >= 0 ? '+' : '';
+            els.kpiRecoveryProfit.textContent = `${profitSign}${fmtInt(recoveryRecord.profit)} (${profitSign}${fmtDec(recoveryRecord.roiPct, 1)}%)`;
 
-            // 4. 更新三階段里程碑說明
+            // 4. 更新三階段里程碑說明（與圖表三段背景色塊完全對應）
+            const phase2Start = Math.min(state.bottomMonth + 1, breakevenMonth);
+            const phase3Start = Math.min(breakevenMonth + 1, state.recoveryMonth);
             els.milestonePhase1.textContent = `第 1～${state.bottomMonth} 月下跌 -${state.maxDrop}% 至 ${fmtDec(bottomPrice, 2)} 元，低檔累積大量零股`;
-            els.milestonePhase2.textContent = `第 ${breakevenMonth} 個月市價穿越成本線正式回本，比大盤提前 ${Math.max(0, savedMonthsVsIndex)} 個月`;
-            els.milestonePhase3.textContent = `第 ${state.recoveryMonth} 個月 ${profile.code} 重返 ${state.startPrice} 元，累積報酬率達 +${fmtDec(recoveryRecord.roiPct, 1)}%`;
+            els.milestonePhase2.textContent = `第 ${phase2Start}～${breakevenMonth} 月反彈，第 ${breakevenMonth} 月市價穿越成本線回本（提前 ${Math.max(0, savedMonthsVsIndex)} 個月）`;
+            els.milestonePhase3.textContent = `第 ${phase3Start}～${state.recoveryMonth} 月處於獲利區間，重返 ${state.startPrice} 元時總報酬率達 +${fmtDec(recoveryRecord.roiPct, 1)}%`;
 
             // 5. 更新雙軌圖表與明細表
             renderChart(activeSim, baseSim);
@@ -1070,8 +1096,83 @@
         }
 
         // ==========================================
-        // 4. 繪製 Chart.js 雙視角互動圖表
+        // 4. 繪製 Chart.js 雙視角互動圖表（含三階段背景色塊連動插件）
         // ==========================================
+        const phaseZonePlugin = {
+            id: 'phaseZonePlugin',
+            beforeDatasetsDraw(chart) {
+                const { ctx, chartArea, scales } = chart;
+                if (!chartArea || !scales.x) return;
+
+                const meta = chart.options.plugins.phaseZonePlugin;
+                if (!meta) return;
+
+                const { bottomIdx, breakevenIdx, recoveryIdx, totalCount } = meta;
+                const { top, bottom, left, right } = chartArea;
+                const height = bottom - top;
+
+                const getPixelX = (idx) => {
+                    const clamped = Math.max(0, Math.min(totalCount - 1, idx));
+                    return scales.x.getPixelForValue(clamped);
+                };
+
+                const xStart = left;
+                const xBottom = getPixelX(bottomIdx);
+                const xBreakeven = getPixelX(breakevenIdx);
+                const xRecovery = getPixelX(recoveryIdx);
+
+                ctx.save();
+
+                // 階段一：空頭築底期（淡玫瑰紅底色，對應下方紅卡）
+                if (xBottom > xStart) {
+                    ctx.fillStyle = 'rgba(255, 228, 230, 0.48)';
+                    ctx.fillRect(xStart, top, xBottom - xStart, height);
+                }
+
+                // 階段二：反彈至黃金交叉回本（淡翡翠綠底色，對應下方綠卡）
+                if (xBreakeven > xBottom) {
+                    ctx.fillStyle = 'rgba(209, 250, 229, 0.52)';
+                    ctx.fillRect(xBottom, top, xBreakeven - xBottom, height);
+                }
+
+                // 階段三：已回本獲利至重返前高（淡寶藍底色，對應下方藍卡）
+                if (xRecovery > xBreakeven) {
+                    ctx.fillStyle = 'rgba(219, 234, 254, 0.52)';
+                    ctx.fillRect(xBreakeven, top, xRecovery - xBreakeven, height);
+                }
+
+                // 回前高後延伸區（極淡灰藍底色）
+                if (right > xRecovery) {
+                    ctx.fillStyle = 'rgba(241, 245, 249, 0.45)';
+                    ctx.fillRect(xRecovery, top, right - xRecovery, height);
+                }
+
+                // 繪製階段分界虛線與頂部小標籤
+                const drawDivider = (xPos, color, labelText, alignRight = false) => {
+                    if (xPos <= left + 4 || xPos >= right - 4) return;
+                    ctx.beginPath();
+                    ctx.setLineDash([4, 4]);
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 1.2;
+                    ctx.moveTo(xPos, top);
+                    ctx.lineTo(xPos, bottom);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    ctx.font = '700 10px "Noto Sans TC", "Inter", sans-serif';
+                    ctx.fillStyle = color;
+                    ctx.textAlign = alignRight ? 'right' : 'left';
+                    ctx.fillText(labelText, alignRight ? xPos - 4 : xPos + 4, top + 13);
+                };
+
+                drawDivider(xBottom, '#e11d48', '▼ 谷底');
+                drawDivider(xBreakeven, '#059669', '★ 回本');
+                drawDivider(xRecovery, '#1d4ed8', '🏁 回前高', xRecovery > right - 48);
+
+                ctx.restore();
+            }
+        };
+
         function renderChart(activeSim, baseSim) {
             const profile = etfProfiles[state.etfCode];
             const records = activeSim.records;
@@ -1079,6 +1180,13 @@
             const isCompareMode = state.strategy !== 'A';
             const isStopDcaMode = state.strategy === 'E';
             const labels = records.map(r => `第${r.month}月`);
+
+            const zoneConfig = {
+                bottomIdx: state.bottomMonth - 1,
+                breakevenIdx: activeSim.breakevenMonth - 1,
+                recoveryIdx: state.recoveryMonth - 1,
+                totalCount: records.length
+            };
 
             const ctx = document.getElementById('mainSimChart').getContext('2d');
             if (mainSimChart) {
@@ -1089,17 +1197,17 @@
                 els.chartTitle.textContent = `微笑曲線成本對照圖：${profile.code} 市價 vs. 平均持有成本`;
                 els.legendPriceEtfName.textContent = `${profile.code} 市場股價`;
                 if (isStopDcaMode) {
-                    els.chartSubtitle.textContent = '紅色實線為「恐慌停扣平均成本」（低檔停扣期間呈現水平停滯、無法向下攤平），灰色虛線為「純定期定額平均成本」';
+                    els.chartSubtitle.textContent = '圖表背景紅/綠/藍三段色塊直接對應下方三階段卡片；紅色實線為恐慌停扣成本線（水平停滯）';
                     els.legendActiveCostLine.className = 'w-3.5 h-1 bg-rose-600 inline-block rounded';
                     els.legendActiveCostText.textContent = '恐慌停扣平均成本(紅色警示)';
                     els.legendActiveCostText.className = 'font-bold text-rose-700';
                 } else if (isCompareMode) {
-                    els.chartSubtitle.textContent = '橘色實線為「目前加碼策略平均成本」，灰色虛線為「純定期定額平均成本」，可直觀比較成本下壓幅度';
+                    els.chartSubtitle.textContent = '背景紅/綠/藍三段色塊與下方三階段卡片顏色一致；橘色實線為加碼平均成本、灰色虛線為純定期定額成本';
                     els.legendActiveCostLine.className = 'w-3.5 h-1 bg-amber-500 inline-block rounded';
                     els.legendActiveCostText.textContent = '目前策略平均成本';
                     els.legendActiveCostText.className = 'font-semibold text-slate-700';
                 } else {
-                    els.chartSubtitle.textContent = '藍色實線向上穿越橘色成本線即代表正式回本轉正；切換左側投資策略可開啟雙軌成本對照';
+                    els.chartSubtitle.textContent = '背景「紅 → 綠 → 藍」三段色塊直接對應下方三張階段卡片，一眼看清下跌築底、反彈回本與獲利區間';
                     els.legendActiveCostLine.className = 'w-3.5 h-1 bg-amber-500 inline-block rounded';
                     els.legendActiveCostText.textContent = '目前策略平均成本';
                     els.legendActiveCostText.className = 'font-semibold text-slate-700';
@@ -1115,9 +1223,9 @@
                         label: `${profile.code} 市場股價 (元)`,
                         data: records.map(r => Number(r.price.toFixed(2))),
                         borderColor: '#1d4ed8',
-                        backgroundColor: 'rgba(29, 78, 216, 0.08)',
+                        backgroundColor: 'rgba(29, 78, 216, 0.04)',
                         borderWidth: 2.8,
-                        fill: true,
+                        fill: false,
                         tension: 0.25,
                         pointRadius: records.map(r => r.isBreakevenPoint ? 7 : (r.isBottom || r.isRecovery ? 4.5 : 1.5)),
                         pointBackgroundColor: records.map(r => r.isBreakevenPoint ? '#10b981' : (r.isBottom ? '#e11d48' : '#1d4ed8')),
@@ -1155,12 +1263,14 @@
                 mainSimChart = new Chart(ctx, {
                     type: 'line',
                     data: { labels, datasets },
+                    plugins: [phaseZonePlugin],
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
                         interaction: { mode: 'index', intersect: false },
                         plugins: {
                             legend: { display: false },
+                            phaseZonePlugin: zoneConfig,
                             tooltip: {
                                 backgroundColor: 'rgba(15, 23, 42, 0.94)',
                                 padding: 12,
@@ -1169,8 +1279,8 @@
                                         const idx = items[0].dataIndex;
                                         const r = records[idx];
                                         const lines = [];
-                                        if (r.isBottom) lines.push('📍 股災波段最低點');
-                                        if (r.isBreakevenPoint) lines.push('🎉 黃金交叉：整體資產正式回本轉正！');
+                                        if (r.isBottom) lines.push('📍 股災波段最低點（階段一結束）');
+                                        if (r.isBreakevenPoint) lines.push('🎉 黃金交叉：整體資產正式回本轉正（進入階段三）！');
                                         if (r.isRecovery) lines.push(`🏁 ${profile.code} 股價漲回前高點`);
                                         if (r.isPaused) {
                                             lines.push('🛑 恐慌停扣中（投入 $0，平均成本無法向下攤平）');
@@ -1190,7 +1300,7 @@
                                 ticks: { maxTicksLimit: 12, font: { size: 11 }, color: '#64748b' }
                             },
                             y: {
-                                grid: { color: '#f1f5f9' },
+                                grid: { color: 'rgba(148, 163, 184, 0.16)' },
                                 ticks: {
                                     font: { size: 11 },
                                     color: '#64748b',
@@ -1205,7 +1315,7 @@
                 els.chartTitle.textContent = `${profile.code} 累積投入本金 vs. 帳面總市值成長走勢`;
                 els.chartSubtitle.textContent = isStopDcaMode
                     ? '停扣期間本金線呈現水平停滯，因錯過低檔便宜零股，反彈後的市值遠低於藍色虛線（純定期定額總市值）'
-                    : `綠色面積為實際持有 ${profile.code} 總市值，當綠線超越灰色虛線（累積本金）即進入獲利複利區間`;
+                    : `背景「紅 → 綠 → 藍」三段色塊同步標示築底、回本與獲利階段，綠線超越灰色虛線即進入獲利複利區間`;
                 els.legendPriceMode.classList.add('hidden');
                 els.legendAssetMode.classList.remove('hidden');
                 els.legendBaseAssetItem.classList.toggle('hidden', !isCompareMode);
@@ -1215,9 +1325,9 @@
                         label: '目前策略帳面總市值 (NT$)',
                         data: records.map(r => Math.round(r.marketValue)),
                         borderColor: isStopDcaMode ? '#e11d48' : '#10b981',
-                        backgroundColor: isStopDcaMode ? 'rgba(225, 29, 72, 0.12)' : 'rgba(16, 185, 129, 0.16)',
+                        backgroundColor: isStopDcaMode ? 'rgba(225, 29, 72, 0.08)' : 'rgba(16, 185, 129, 0.08)',
                         borderWidth: 2.8,
-                        fill: true,
+                        fill: false,
                         tension: 0.25,
                         pointRadius: records.map(r => r.isBreakevenPoint ? 6 : 0),
                         pointBackgroundColor: '#10b981',
@@ -1255,12 +1365,14 @@
                 mainSimChart = new Chart(ctx, {
                     type: 'line',
                     data: { labels, datasets },
+                    plugins: [phaseZonePlugin],
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
                         interaction: { mode: 'index', intersect: false },
                         plugins: {
                             legend: { display: false },
+                            phaseZonePlugin: zoneConfig,
                             tooltip: {
                                 backgroundColor: 'rgba(15, 23, 42, 0.94)',
                                 padding: 12,
@@ -1280,7 +1392,7 @@
                                 ticks: { maxTicksLimit: 12, font: { size: 11 }, color: '#64748b' }
                             },
                             y: {
-                                grid: { color: '#f1f5f9' },
+                                grid: { color: 'rgba(148, 163, 184, 0.16)' },
                                 ticks: {
                                     font: { size: 11 },
                                     color: '#64748b',
