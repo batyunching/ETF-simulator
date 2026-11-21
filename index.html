@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>台股 0050 (元大台灣50) 股災定期定額微笑曲線模擬器</title>
+    <title>台股熱門 ETF (0050 / 00878 / 00919 / 0056) 股災定期定額微笑曲線模擬器</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js -->
@@ -77,10 +77,10 @@
                 </div>
                 <div>
                     <div class="flex items-center gap-2 flex-wrap">
-                        <h1 class="text-base sm:text-xl font-extrabold tracking-tight">台股 0050 (元大台灣50) 股災定期定額微笑曲線模擬器</h1>
-                        <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">0050 零股實戰版</span>
+                        <h1 class="text-base sm:text-xl font-extrabold tracking-tight">台股熱門 ETF 股災定期定額微笑曲線模擬器</h1>
+                        <span id="headerEtfBadge" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">0050 元大台灣50 實戰版</span>
                     </div>
-                    <p class="text-xs text-slate-300 mt-0.5">整合百年重大股災情境一鍵模擬與四種低檔加碼投資策略雙軌對照</p>
+                    <p class="text-xs text-slate-300 mt-0.5">支援 0050 / 00878 / 00919 / 0056 專屬配息頻率與五種定期定額投資策略雙軌預測</p>
                 </div>
             </div>
             <div class="flex items-center gap-2 shrink-0">
@@ -106,11 +106,11 @@
                             模式 A：純定期定額（基準線）
                         </span>
                         <span id="dividendPill" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white/10 text-emerald-300 border border-emerald-400/30">
-                            含 0050 半年配息再投入
+                            含 0050 半年配息再投入 (年息 ~3.2%)
                         </span>
                     </div>
                     <p id="insightSummaryText" class="text-sm text-slate-200 leading-relaxed pt-1">
-                        正在計算 0050 微笑曲線試算結果...
+                        正在計算 ETF 微笑曲線試算結果...
                     </p>
                 </div>
 
@@ -143,14 +143,69 @@
             <aside class="lg:col-span-4 space-y-5">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-5 space-y-5">
 
-                    <!-- 1. 歷史股災一鍵套用區塊（置於左側面板最上方） -->
+                    <!-- 0. 選擇模擬 ETF 標的（0050 / 00878 / 00919 / 0056） -->
+                    <div class="p-3.5 rounded-xl bg-emerald-50/80 border border-emerald-200 space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-xs font-extrabold text-emerald-950 flex items-center gap-1.5">
+                                <svg class="w-4 h-4 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                                選擇模擬 ETF 標的
+                            </h2>
+                            <span id="etfTypeBadge" class="text-[10px] font-bold text-emerald-800 bg-white px-2 py-0.5 rounded-full border border-emerald-200">市值型・半年配</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2" id="etfSelectorGroup">
+                            <button type="button" data-etf="0050" class="etf-btn text-left p-2.5 rounded-xl border-2 border-emerald-700 bg-white shadow-xs transition">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-black text-emerald-950">0050</span>
+                                    <span class="text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 rounded">市值型</span>
+                                </div>
+                                <div class="text-[11px] font-semibold text-slate-700 mt-0.5">元大台灣50</div>
+                                <div class="text-[10px] text-slate-500">半年配・年息~3.2%</div>
+                            </button>
+
+                            <button type="button" data-etf="00878" class="etf-btn text-left p-2.5 rounded-xl border border-slate-200 bg-white hover:border-emerald-500 transition">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-black text-slate-800">00878</span>
+                                    <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 rounded">高股息</span>
+                                </div>
+                                <div class="text-[11px] font-semibold text-slate-700 mt-0.5">國泰永續高股息</div>
+                                <div class="text-[10px] text-slate-500">季配息・年息~7.5%</div>
+                            </button>
+
+                            <button type="button" data-etf="00919" class="etf-btn text-left p-2.5 rounded-xl border border-slate-200 bg-white hover:border-emerald-500 transition">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-black text-slate-800">00919</span>
+                                    <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 rounded">高股息</span>
+                                </div>
+                                <div class="text-[11px] font-semibold text-slate-700 mt-0.5">群益台灣精選高息</div>
+                                <div class="text-[10px] text-slate-500">季配息・年息~9.5%</div>
+                            </button>
+
+                            <button type="button" data-etf="0056" class="etf-btn text-left p-2.5 rounded-xl border border-slate-200 bg-white hover:border-emerald-500 transition">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-black text-slate-800">0056</span>
+                                    <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 rounded">高股息</span>
+                                </div>
+                                <div class="text-[11px] font-semibold text-slate-700 mt-0.5">元大高股息</div>
+                                <div class="text-[10px] text-slate-500">季配息・年息~8.2%</div>
+                            </button>
+                        </div>
+
+                        <div id="etfProfileNote" class="p-2 rounded-lg bg-white/90 border border-emerald-100 text-[11px] text-slate-600 leading-relaxed">
+                            <strong class="text-emerald-950">📊 0050 特性：</strong>追蹤台灣前 50 大市值企業，爆發力強、長期資本利得成長率高（回高後年化約 8%），半年配息一次。
+                        </div>
+                    </div>
+
+                    <!-- 1. 歷史股災一鍵套用區塊 -->
                     <div class="p-3.5 rounded-xl bg-blue-50/80 border border-blue-200 space-y-2.5">
                         <div class="flex items-center justify-between">
                             <h2 class="text-xs font-extrabold text-blue-950 flex items-center gap-1.5">
                                 <svg class="w-4 h-4 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
-                                歷史股災一鍵套用（0050 實證）
+                                歷史股災一鍵套用（台股實證）
                             </h2>
                             <span class="text-[10px] font-bold text-blue-700 bg-white px-2 py-0.5 rounded-full border border-blue-200">點擊套用</span>
                         </div>
@@ -237,18 +292,18 @@
                         </div>
                     </div>
 
-                    <!-- 3. 0050 起始股價基準設定 -->
+                    <!-- 3. ETF 起始股價基準設定 -->
                     <div class="space-y-2 pt-1 border-t border-slate-100">
                         <div class="flex items-center justify-between">
-                            <label for="startPrice" class="text-xs font-bold text-slate-700">0050 起始高點股價 (元)</label>
-                            <div class="flex items-center gap-1.5">
-                                <button type="button" id="presetPrice200" class="px-2 py-0.5 text-[11px] font-bold rounded bg-blue-900 text-white transition">200 元基準</button>
-                                <button type="button" id="presetPrice45" class="px-2 py-0.5 text-[11px] font-bold rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition">拆股參考 45 元</button>
+                            <label id="startPriceLabel" for="startPrice" class="text-xs font-bold text-slate-700">0050 起始高點股價 (元)</label>
+                            <div id="priceQuickButtons" class="flex items-center gap-1.5">
+                                <button type="button" id="presetPricePrimary" class="px-2 py-0.5 text-[11px] font-bold rounded bg-blue-900 text-white transition">200 元基準</button>
+                                <button type="button" id="presetPriceSecondary" class="px-2 py-0.5 text-[11px] font-bold rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition">拆股參考 45 元</button>
                             </div>
                         </div>
                         <div class="flex items-center gap-3">
-                            <input type="range" id="startPriceSlider" min="30" max="250" step="5" value="200" class="flex-1">
-                            <input type="number" id="startPrice" min="10" max="500" step="1" value="200" class="w-20 px-2 py-1 text-sm font-extrabold text-right text-blue-950 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+                            <input type="range" id="startPriceSlider" min="15" max="250" step="1" value="200" class="flex-1">
+                            <input type="number" id="startPrice" min="10" max="500" step="0.5" value="200" class="w-20 px-2 py-1 text-sm font-extrabold text-right text-blue-950 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
                         </div>
                     </div>
 
@@ -311,15 +366,15 @@
                         </div>
                     </div>
 
-                    <!-- 8. 0050 半年配息再投入開關 -->
+                    <!-- 8. ETF 配息再投入開關（自動隨標的切換半年配/季配） -->
                     <div class="pt-3 border-t border-slate-100">
                         <div class="flex items-start justify-between gap-3 p-3 rounded-xl bg-emerald-50/80 border border-emerald-200">
                             <div class="space-y-0.5">
                                 <div class="flex items-center gap-1.5">
-                                    <span class="text-xs font-extrabold text-slate-800">0050 半年配息再投入</span>
-                                    <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-emerald-200 text-emerald-900">年息 ~3.2%</span>
+                                    <span id="dividendToggleTitle" class="text-xs font-extrabold text-slate-800">0050 半年配息再投入</span>
+                                    <span id="dividendYieldBadge" class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-emerald-200 text-emerald-900">年息 ~3.2%</span>
                                 </div>
-                                <p class="text-[11px] text-slate-600 leading-snug">
+                                <p id="dividendToggleDesc" class="text-[11px] text-slate-600 leading-snug">
                                     每逢第 6、12、18... 個月自動模擬現金股息（單次 1.6%）再買進 0050 零股。
                                 </p>
                             </div>
@@ -424,7 +479,7 @@
                     <!-- 圖例列 -->
                     <div id="legendPriceMode" class="flex flex-wrap items-center gap-4 text-xs">
                         <span class="flex items-center gap-1.5 font-semibold text-slate-700">
-                            <span class="w-3 h-3 rounded-full bg-blue-600 inline-block"></span>0050 市場股價
+                            <span class="w-3 h-3 rounded-full bg-blue-600 inline-block"></span><span id="legendPriceEtfName">0050 市場股價</span>
                         </span>
                         <span id="legendActiveCostItem" class="flex items-center gap-1.5 font-semibold text-slate-700">
                             <span id="legendActiveCostLine" class="w-3.5 h-1 bg-amber-500 inline-block rounded"></span>
@@ -476,11 +531,11 @@
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200/90 overflow-hidden">
                     <div class="p-4 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 bg-slate-50/70">
                         <div>
-                            <h3 class="text-sm sm:text-base font-extrabold text-slate-900 flex items-center gap-2">
+                            <h3 id="ledgerTableTitle" class="text-sm sm:text-base font-extrabold text-slate-900 flex items-center gap-2">
                                 <svg class="w-4 h-4 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                 </svg>
-                                0050 逐月定期定額零股累積與損益明細表
+                                <span id="ledgerTableTitleText">0050 逐月定期定額零股累積與損益明細表</span>
                             </h3>
                             <p class="text-xs text-slate-500 mt-0.5">綠色高亮列為「正式回本轉正」月份（模擬至漲回前高後 6 個月）</p>
                         </div>
@@ -505,7 +560,7 @@
                             <thead class="bg-slate-100 sticky top-0 z-10 text-[11px] font-bold text-slate-600 uppercase tracking-wider border-b border-slate-200">
                                 <tr>
                                     <th class="py-3 px-3.5 whitespace-nowrap">月份</th>
-                                    <th class="py-3 px-3.5 whitespace-nowrap text-right">0050 市價</th>
+                                    <th id="thPriceCol" class="py-3 px-3.5 whitespace-nowrap text-right">0050 市價</th>
                                     <th class="py-3 px-3.5 whitespace-nowrap text-right">距前高跌幅</th>
                                     <th class="py-3 px-3.5 whitespace-nowrap text-right">當月投入</th>
                                     <th class="py-3 px-3.5 whitespace-nowrap text-right">買進零股</th>
@@ -533,22 +588,86 @@
     <!-- 頁尾免責說明 -->
     <footer class="bg-white border-t border-slate-200 py-4 mt-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
-            <p>註：本模擬器採 U 型微笑曲線路徑試算台股 0050 零股定期定額（精確至小數點後 2 位），未計入券商手續費與證交稅；歷史數據僅供紀律投資參考。</p>
-            <p class="shrink-0 font-medium text-slate-500">台股 0050 長期投資紀律模擬工具</p>
+            <p>註：本模擬器採 U 型微笑曲線路徑試算台股熱門 ETF 零股定期定額（含季配息／半年配息再投入效果），未計入券商手續費與證交稅；歷史數據僅供紀律投資參考。</p>
+            <p class="shrink-0 font-medium text-slate-500">台股 ETF 長期投資紀律模擬工具</p>
         </div>
     </footer>
 
     <script>
         // ==========================================
-        // 1. 狀態定義與 DOM 元素綁定
+        // 1. 狀態定義與 ETF 專屬參數資料庫
         // ==========================================
+        const etfProfiles = {
+            '0050': {
+                code: '0050',
+                name: '元大台灣50',
+                category: '市值型',
+                freqLabel: '半年配',
+                freqMonths: 6,
+                annualYield: 3.2,
+                postRecoveryAnnualGrowth: 0.08,
+                defaultPrice: 200,
+                quickPrices: [
+                    { label: '200 元基準', val: 200 },
+                    { label: '拆股參考 45 元', val: 45 }
+                ],
+                profileNote: '<strong class="text-emerald-950">📊 0050 特性：</strong>追蹤台灣前 50 大市值企業，成分股含大量半導體權值股，反彈爆發力強、長期資本利得成長率高（回高後年化約 8%），每半年配息一次。'
+            },
+            '00878': {
+                code: '00878',
+                name: '國泰永續高股息',
+                category: '高股息',
+                freqLabel: '季配息',
+                freqMonths: 3,
+                annualYield: 7.5,
+                postRecoveryAnnualGrowth: 0.055,
+                defaultPrice: 23,
+                quickPrices: [
+                    { label: '23 元基準', val: 23 },
+                    { label: '20 元整數', val: 20 }
+                ],
+                profileNote: '<strong class="text-emerald-950">📊 00878 特性：</strong>納入 ESG 評級與穩健配息選股，波動度通常較大盤溫和；每 3 個月（季配）發放高股息再投入，股災期間靠高殖利率買進更多廉價零股，能顯著縮短回本時間。'
+            },
+            '00919': {
+                code: '00919',
+                name: '群益台灣精選高息',
+                category: '高股息',
+                freqLabel: '季配息',
+                freqMonths: 3,
+                annualYield: 9.5,
+                postRecoveryAnnualGrowth: 0.055,
+                defaultPrice: 25,
+                quickPrices: [
+                    { label: '25 元基準', val: 25 },
+                    { label: '22 元參考', val: 22 }
+                ],
+                profileNote: '<strong class="text-emerald-950">📊 00919 特性：</strong>精準鎖定高股息率成分股，季配息現金流極強（年化殖利率約 9.5%）；在股災低檔區間，每季配發的現金股息再投入可大幅壓低持股平均成本。'
+            },
+            '0056': {
+                code: '0056',
+                name: '元大高股息',
+                category: '高股息',
+                freqLabel: '季配息',
+                freqMonths: 3,
+                annualYield: 8.2,
+                postRecoveryAnnualGrowth: 0.06,
+                defaultPrice: 38,
+                quickPrices: [
+                    { label: '38 元基準', val: 38 },
+                    { label: '32 元參考', val: 32 }
+                ],
+                profileNote: '<strong class="text-emerald-950">📊 0056 特性：</strong>台灣歷史最悠久的高股息 ETF（已改為季配息），預測未來一年現金股利殖利率；兼具穩健季配現金流與景氣循環反彈動能，適合低檔金字塔加碼。'
+            }
+        };
+
         const state = {
+            etfCode: '0050',
             startPrice: 200,
             maxDrop: 30,
             bottomMonth: 8,
             recoveryMonth: 24,
             monthlyAmount: 10000,
-            strategy: 'A',        // 'A' | 'B' | 'C' | 'D'
+            strategy: 'A',        // 'A' | 'B' | 'C' | 'D' | 'E'
             dividendEnabled: true,
             chartTab: 'price',    // 'price' | 'asset'
             activePreset: 'default'
@@ -584,16 +703,20 @@
 
         const presetDescriptions = {
             default: '<strong class="text-blue-950">📌 預設基準（跌 30% / 第 8 月見底 / 24 月回前高）：</strong>模擬標準中度熊市循環，前 8 個月逐步築底、後 16 個月溫和復甦，最適合觀察定期定額微笑曲線的成本鈍化與提前回本效應。',
-            covid2020: '<strong class="text-blue-950">📌 2020 疫情股災（跌 34% / 第 2 月見底 / 5 月回前高）：</strong>2020 年初新冠疫情爆發使台股 0050 短線急挫約 34%，隨後受惠全球央行寬鬆與半導體需求呈現 V 型急彈，僅約 5 個月即迅速創高。',
-            bear2022: '<strong class="text-blue-950">📌 2022 升息熊市（跌 25% / 第 9 月見底 / 24 月回前高）：</strong>聯準會激進升息與電子業庫存調整使 0050 經歷 9 個月修正，堅持定期定額者在 2023 下半年 AI 浪潮啟動時即遠早於指數回前高率先大幅獲利。',
-            gfc2008: '<strong class="text-blue-950">📌 2008 金融海嘯（跌 57% / 第 17 月見底 / 65 月回前高）：</strong>百年級金融危機使 0050 腰斬逾半，考驗長達 5 年半的紀律耐心；但在深度低檔累積的大量便宜零股，使定期定額回本時間縮短至單筆投資的一半以下。'
+            covid2020: '<strong class="text-blue-950">📌 2020 疫情股災（跌 34% / 第 2 月見底 / 5 月回前高）：</strong>2020 年初新冠疫情爆發使台股短線急挫約 34%，隨後受惠全球央行寬鬆與高息買盤進駐呈現 V 型急彈，僅約 5 個月即迅速創高。',
+            bear2022: '<strong class="text-blue-950">📌 2022 升息熊市（跌 25% / 第 9 月見底 / 24 月回前高）：</strong>聯準會激進升息與電子業庫存調整使台股經歷 9 個月修正，堅持定期定額（尤其是高股息季配再投入與低檔加碼者）遠早於大盤回前高便率先獲利。',
+            gfc2008: '<strong class="text-blue-950">📌 2008 金融海嘯（跌 57% / 第 17 月見底 / 65 月回前高）：</strong>百年級金融危機使台股腰斬逾半，考驗長達 5 年半的紀律耐心；但在深度低檔累積的大量便宜零股與股息再投入，使定期定額回本時間縮短至單筆投資的一半以下。'
         };
 
         const els = {
+            headerEtfBadge: document.getElementById('headerEtfBadge'),
+            etfTypeBadge: document.getElementById('etfTypeBadge'),
+            etfProfileNote: document.getElementById('etfProfileNote'),
+            startPriceLabel: document.getElementById('startPriceLabel'),
             startPriceSlider: document.getElementById('startPriceSlider'),
             startPrice: document.getElementById('startPrice'),
-            presetPrice200: document.getElementById('presetPrice200'),
-            presetPrice45: document.getElementById('presetPrice45'),
+            presetPricePrimary: document.getElementById('presetPricePrimary'),
+            presetPriceSecondary: document.getElementById('presetPriceSecondary'),
             presetHistoryNote: document.getElementById('presetHistoryNote'),
             monthlyAmount: document.getElementById('monthlyAmount'),
             monthlyAmountInput: document.getElementById('monthlyAmountInput'),
@@ -604,6 +727,9 @@
             recoveryMonth: document.getElementById('recoveryMonth'),
             recoveryMonthVal: document.getElementById('recoveryMonthVal'),
             dividendToggle: document.getElementById('dividendToggle'),
+            dividendToggleTitle: document.getElementById('dividendToggleTitle'),
+            dividendYieldBadge: document.getElementById('dividendYieldBadge'),
+            dividendToggleDesc: document.getElementById('dividendToggleDesc'),
             resetBtn: document.getElementById('resetBtn'),
             // 橫幅與效益對照
             strategyBanner: document.getElementById('strategyBanner'),
@@ -637,6 +763,7 @@
             chartTitle: document.getElementById('chartTitle'),
             chartSubtitle: document.getElementById('chartSubtitle'),
             legendPriceMode: document.getElementById('legendPriceMode'),
+            legendPriceEtfName: document.getElementById('legendPriceEtfName'),
             legendActiveCostLine: document.getElementById('legendActiveCostLine'),
             legendActiveCostText: document.getElementById('legendActiveCostText'),
             legendBaseCostItem: document.getElementById('legendBaseCostItem'),
@@ -646,6 +773,8 @@
             milestonePhase2: document.getElementById('milestonePhase2'),
             milestonePhase3: document.getElementById('milestonePhase3'),
             // 表格與 CSV
+            ledgerTableTitleText: document.getElementById('ledgerTableTitleText'),
+            thPriceCol: document.getElementById('thPriceCol'),
             ledgerBody: document.getElementById('ledgerBody'),
             exportCsvBtn: document.getElementById('exportCsvBtn'),
             toggleTableBtn: document.getElementById('toggleTableBtn'),
@@ -696,10 +825,15 @@
         }
 
         function simulateSingleStrategy(strategyCode) {
-            const { startPrice, maxDrop, bottomMonth, recoveryMonth, monthlyAmount, dividendEnabled } = state;
+            const { etfCode, startPrice, maxDrop, bottomMonth, recoveryMonth, monthlyAmount, dividendEnabled } = state;
+            const profile = etfProfiles[etfCode];
             const bottomPrice = startPrice * (1 - maxDrop / 100);
             const totalMonths = recoveryMonth + 6;
-            const postRecoveryMonthlyGrowth = Math.pow(1.08, 1 / 12) - 1;
+            const postRecoveryMonthlyGrowth = Math.pow(1 + profile.postRecoveryAnnualGrowth, 1 / 12) - 1;
+
+            // 計算每次配息殖利率（半年配 = 年息 / 2；季配息 = 年息 / 4）
+            const payoutsPerYear = 12 / profile.freqMonths;
+            const singlePayoutRate = (profile.annualYield / 100) / payoutsPerYear;
 
             const records = [];
             let cumShares = 0;
@@ -709,7 +843,7 @@
             let breakevenMonth = null;
 
             for (let m = 1; m <= totalMonths; m++) {
-                // 1. 計算當月 U 型平滑微笑曲線 0050 市價
+                // 1. 計算當月 U 型平滑微笑曲線 ETF 市價
                 let price = startPrice;
                 if (m <= bottomMonth) {
                     const t = m / bottomMonth;
@@ -726,16 +860,16 @@
 
                 const drawdownPct = ((price - startPrice) / startPrice) * 100;
 
-                // 2. 0050 半年配息再投入（每逢第 6、12、18... 個月配發 1.6% 現金股息自動買回零股）
+                // 2. ETF 配息再投入（依據該 ETF 為半年配或季配息自動買回零股）
                 let dividendCash = 0;
                 let dividendShares = 0;
-                if (dividendEnabled && (m % 6 === 0)) {
-                    dividendCash = cumShares * price * 0.016;
+                if (dividendEnabled && (m % profile.freqMonths === 0)) {
+                    dividendCash = cumShares * price * singlePayoutRate;
                     dividendShares = dividendCash / price;
                     cumShares += dividendShares;
                 }
 
-                // 3. 依據所選策略計算當月投入金額與買進零股數（精確至小數點後 2 位概念）
+                // 3. 依據所選策略計算當月投入金額與買進零股數
                 const { mult, label: boostLabel, isPaused } = getStrategyMultiplier(strategyCode, drawdownPct);
                 const investedThisMonth = monthlyAmount * mult;
                 const sharesBought = investedThisMonth / price;
@@ -800,6 +934,7 @@
         // 3. 更新整體儀表板 UI 與雙軌效益對照
         // ==========================================
         function updateDashboard() {
+            const profile = etfProfiles[state.etfCode];
             // 同時執行基準線（模式 A）與目前選定策略（Active）的雙軌模擬
             const baseSim = simulateSingleStrategy('A');
             const activeSim = state.strategy === 'A' ? baseSim : simulateSingleStrategy(state.strategy);
@@ -827,7 +962,9 @@
                 els.comparisonCard.className = 'shrink-0 bg-white/10 backdrop-blur-xs border border-white/15 rounded-xl p-3.5 sm:min-w-[310px]';
             }
 
-            els.dividendPill.textContent = state.dividendEnabled ? '含 0050 半年配息再投入' : '未含配息再投入';
+            els.dividendPill.textContent = state.dividendEnabled
+                ? `含 ${profile.code} ${profile.freqLabel}息再投入 (年息 ~${profile.annualYield}%)`
+                : `未含 ${profile.code} 配息再投入`;
 
             const reboundFromBottomPct = (((beRecord.price - bottomPrice) / bottomPrice) * 100).toFixed(1);
             const stillBelowPeakPct = Math.max(0, ((state.startPrice - beRecord.price) / state.startPrice) * 100).toFixed(1);
@@ -836,12 +973,12 @@
                 const delayMonths = Math.max(0, activeSim.breakevenMonth - baseSim.breakevenMonth);
                 const lostProfit = Math.max(0, baseSim.recoveryRecord.profit - activeSim.recoveryRecord.profit);
                 els.insightSummaryText.innerHTML = `
-                    <strong class="text-amber-300">⚠️ 恐慌停扣警示：</strong>當 0050 跌幅超過 20% 時停止扣款（共停扣 <strong class="text-rose-200">${pausedMonthsCount} 個月</strong>），導致平均成本停滯在 <strong class="text-rose-200">${fmtDec(lowestAvgCost, 1)} 元</strong> 無法向下攤平！
+                    <strong class="text-amber-300">⚠️ 恐慌停扣警示（${profile.code} ${profile.name}）：</strong>當跌幅超過 20% 時停止扣款（共停扣 <strong class="text-rose-200">${pausedMonthsCount} 個月</strong>），導致平均成本停滯在 <strong class="text-rose-200">${fmtDec(lowestAvgCost, 2)} 元</strong> 無法向下攤平！
                     相較純定期定額，恐慌停扣導致回本時間<strong class="text-amber-300 underline decoration-amber-400 decoration-2 underline-offset-2">延後了 ${delayMonths} 個月（從第 ${baseSim.breakevenMonth} 個月拖延至第 ${activeSim.breakevenMonth} 個月）</strong>，回前高時總獲利<strong class="text-rose-200">少賺了 NT$ ${fmtInt(lostProfit)} 元</strong>！
                 `;
             } else {
                 els.insightSummaryText.innerHTML = `
-                    在 0050 從 <strong class="text-white">${state.startPrice} 元</strong>下跌 <strong class="text-rose-300">-${state.maxDrop}%</strong>（谷底 <strong class="text-rose-300">${fmtDec(bottomPrice, 1)} 元</strong>）的情境下，透過紀律扣款使平均成本最低降至 <strong class="text-amber-300">${fmtDec(lowestAvgCost, 1)} 元</strong>。
+                    在 <strong class="text-emerald-300">${profile.code} (${profile.name})</strong> 從 <strong class="text-white">${state.startPrice} 元</strong>下跌 <strong class="text-rose-300">-${state.maxDrop}%</strong>（谷底 <strong class="text-rose-300">${fmtDec(bottomPrice, 2)} 元</strong>）的情境下，透過紀律扣款與${profile.freqLabel}再投入使平均成本最低降至 <strong class="text-amber-300">${fmtDec(lowestAvgCost, 2)} 元</strong>。
                     股價僅需從底部反彈 <strong class="text-emerald-300">+${reboundFromBottomPct}%</strong>（距前高仍差 ${stillBelowPeakPct}%），於 <strong class="text-emerald-300 underline decoration-emerald-400 decoration-2 underline-offset-2">第 ${breakevenMonth} 個月</strong>即全數回本！至第 ${state.recoveryMonth} 個月重返前高時，總獲利達 <strong class="text-emerald-300">+NT$ ${fmtInt(recoveryRecord.profit)} (+${fmtDec(recoveryRecord.roiPct, 1)}%)</strong>。
                 `;
             }
@@ -889,7 +1026,7 @@
             // 3. 更新四大核心指標 KPI 卡片
             // KPI 1
             els.kpiBreakevenMonth.textContent = `第 ${breakevenMonth} 個月`;
-            els.kpiBreakevenPrice.textContent = `(市價 ${fmtDec(beRecord.price, 1)}元)`;
+            els.kpiBreakevenPrice.textContent = `(市價 ${fmtDec(beRecord.price, 2)}元)`;
             const savedMonthsVsIndex = state.recoveryMonth - breakevenMonth;
             els.kpiBreakevenDiff.textContent = savedMonthsVsIndex > 0
                 ? `⚡ 比大盤回前高提前 ${savedMonthsVsIndex} 個月`
@@ -897,10 +1034,10 @@
 
             // KPI 2
             const discountFold = Math.round((lowestAvgCost / state.startPrice) * 100);
-            els.kpiLowestAvgCost.textContent = `${fmtDec(lowestAvgCost, 1)} 元`;
+            els.kpiLowestAvgCost.textContent = `${fmtDec(lowestAvgCost, 2)} 元`;
             els.kpiCostDiscount.textContent = `約 ${discountFold} 折`;
             els.kpiLowestCostMonth.textContent = `第 ${lowestAvgCostMonth} 個月最低`;
-            els.kpiBottomPriceHint.textContent = `谷底 ${fmtDec(bottomPrice, 1)}元`;
+            els.kpiBottomPriceHint.textContent = `谷底 ${fmtDec(bottomPrice, 2)}元`;
 
             // KPI 3
             const basePrincipal = state.monthlyAmount * state.recoveryMonth;
@@ -923,9 +1060,9 @@
             els.kpiRecoveryProfit.textContent = `${pSign}${fmtInt(recoveryRecord.profit)} (${pSign}${fmtDec(recoveryRecord.roiPct, 1)}%)`;
 
             // 4. 更新三階段里程碑說明
-            els.milestonePhase1.textContent = `第 1～${state.bottomMonth} 月下跌 -${state.maxDrop}% 至 ${fmtDec(bottomPrice, 1)} 元，低檔累積大量零股`;
+            els.milestonePhase1.textContent = `第 1～${state.bottomMonth} 月下跌 -${state.maxDrop}% 至 ${fmtDec(bottomPrice, 2)} 元，低檔累積大量零股`;
             els.milestonePhase2.textContent = `第 ${breakevenMonth} 個月市價穿越成本線正式回本，比大盤提前 ${Math.max(0, savedMonthsVsIndex)} 個月`;
-            els.milestonePhase3.textContent = `第 ${state.recoveryMonth} 個月 0050 重返 ${state.startPrice} 元，累積報酬率達 +${fmtDec(recoveryRecord.roiPct, 1)}%`;
+            els.milestonePhase3.textContent = `第 ${state.recoveryMonth} 個月 ${profile.code} 重返 ${state.startPrice} 元，累積報酬率達 +${fmtDec(recoveryRecord.roiPct, 1)}%`;
 
             // 5. 更新雙軌圖表與明細表
             renderChart(activeSim, baseSim);
@@ -936,6 +1073,7 @@
         // 4. 繪製 Chart.js 雙視角互動圖表
         // ==========================================
         function renderChart(activeSim, baseSim) {
+            const profile = etfProfiles[state.etfCode];
             const records = activeSim.records;
             const baseRecords = baseSim.records;
             const isCompareMode = state.strategy !== 'A';
@@ -948,7 +1086,8 @@
             }
 
             if (state.chartTab === 'price') {
-                els.chartTitle.textContent = '微笑曲線成本對照圖：0050 市價 vs. 平均持有成本';
+                els.chartTitle.textContent = `微笑曲線成本對照圖：${profile.code} 市價 vs. 平均持有成本`;
+                els.legendPriceEtfName.textContent = `${profile.code} 市場股價`;
                 if (isStopDcaMode) {
                     els.chartSubtitle.textContent = '紅色實線為「恐慌停扣平均成本」（低檔停扣期間呈現水平停滯、無法向下攤平），灰色虛線為「純定期定額平均成本」';
                     els.legendActiveCostLine.className = 'w-3.5 h-1 bg-rose-600 inline-block rounded';
@@ -973,7 +1112,7 @@
 
                 const datasets = [
                     {
-                        label: '0050 市場股價 (元)',
+                        label: `${profile.code} 市場股價 (元)`,
                         data: records.map(r => Number(r.price.toFixed(2))),
                         borderColor: '#1d4ed8',
                         backgroundColor: 'rgba(29, 78, 216, 0.08)',
@@ -1032,13 +1171,13 @@
                                         const lines = [];
                                         if (r.isBottom) lines.push('📍 股災波段最低點');
                                         if (r.isBreakevenPoint) lines.push('🎉 黃金交叉：整體資產正式回本轉正！');
-                                        if (r.isRecovery) lines.push('🏁 0050 股價漲回前高點');
+                                        if (r.isRecovery) lines.push(`🏁 ${profile.code} 股價漲回前高點`);
                                         if (r.isPaused) {
                                             lines.push('🛑 恐慌停扣中（投入 $0，平均成本無法向下攤平）');
                                         } else if (r.boostLabel) {
                                             lines.push(`⚡ 本月觸發低檔加碼 (${r.boostLabel})`);
                                         }
-                                        if (r.dividendShares > 0) lines.push(`💰 半年配息自動再投入 +${fmtDec(r.dividendShares, 2)} 股`);
+                                        if (r.dividendShares > 0) lines.push(`💰 ${profile.freqLabel}息自動再投入 +${fmtDec(r.dividendShares, 2)} 股`);
                                         lines.push(`累積報酬率：${r.roiPct >= 0 ? '+' : ''}${fmtDec(r.roiPct, 1)}%`);
                                         return lines;
                                     }
@@ -1063,10 +1202,10 @@
                 });
             } else {
                 // 視角二：累積本金與帳面總市值成長圖
-                els.chartTitle.textContent = '累積投入本金 vs. 帳面總市值成長走勢';
+                els.chartTitle.textContent = `${profile.code} 累積投入本金 vs. 帳面總市值成長走勢`;
                 els.chartSubtitle.textContent = isStopDcaMode
                     ? '停扣期間本金線呈現水平停滯，因錯過低檔便宜零股，反彈後的市值遠低於藍色虛線（純定期定額總市值）'
-                    : '綠色面積為實際持有 0050 總市值，當綠線超越灰色虛線（累積本金）即進入獲利複利區間';
+                    : `綠色面積為實際持有 ${profile.code} 總市值，當綠線超越灰色虛線（累積本金）即進入獲利複利區間`;
                 els.legendPriceMode.classList.add('hidden');
                 els.legendAssetMode.classList.remove('hidden');
                 els.legendBaseAssetItem.classList.toggle('hidden', !isCompareMode);
@@ -1214,7 +1353,8 @@
 
         function exportToCsv() {
             if (!lastActiveRecords.length) return;
-            const headers = ['月份', '0050市價(元)', '距前高跌幅(%)', '當月投入(元)', '買進零股(股)', '配息再投入(股)', '累積總股數(股)', '平均成本(元)', '累積本金(元)', '帳面總市值(元)', '累積報酬率(%)', '狀態'];
+            const profile = etfProfiles[state.etfCode];
+            const headers = ['月份', `${profile.code}市價(元)`, '距前高跌幅(%)', '當月投入(元)', '買進零股(股)', '配息再投入(股)', '累積總股數(股)', '平均成本(元)', '累積本金(元)', '帳面總市值(元)', '累積報酬率(%)', '狀態'];
             const rows = lastActiveRecords.map(r => [
                 `第${r.month}月`,
                 r.price.toFixed(2),
@@ -1227,7 +1367,7 @@
                 Math.round(r.cumPrincipal),
                 Math.round(r.marketValue),
                 r.roiPct.toFixed(1),
-                r.isBreakevenPoint ? '正式回本' : (r.isProfitable ? '已回本獲利' : '低檔攤平')
+                r.isBreakevenPoint ? '正式回本' : (r.isPaused ? '恐慌停扣' : (r.isProfitable ? '已回本獲利' : '低檔攤平'))
             ]);
 
             const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
@@ -1235,7 +1375,7 @@
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `台股0050_股災定期定額模擬_策略${state.strategy}.csv`;
+            link.download = `台股${profile.code}_股災定期定額模擬_策略${state.strategy}.csv`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -1246,20 +1386,54 @@
         // 6. 事件監聽與控制項同步
         // ==========================================
         function syncControls() {
-            els.startPriceSlider.value = Math.min(250, Math.max(30, state.startPrice));
+            const profile = etfProfiles[state.etfCode];
+            const payoutsPerYear = 12 / profile.freqMonths;
+            const singleYieldPct = (profile.annualYield / payoutsPerYear).toFixed(2);
+            const scheduleHint = profile.freqMonths === 3 ? '第 3、6、9、12...' : '第 6、12、18...';
+
+            // 同步 ETF 卡片高亮與標題標籤
+            els.headerEtfBadge.textContent = `${profile.code} ${profile.name} 實戰版`;
+            els.etfTypeBadge.textContent = `${profile.category}・${profile.freqLabel}`;
+            els.etfProfileNote.innerHTML = profile.profileNote;
+            els.startPriceLabel.textContent = `${profile.code} 起始高點股價 (元)`;
+            els.ledgerTableTitleText.textContent = `${profile.code} 逐月定期定額零股累積與損益明細表`;
+            els.thPriceCol.textContent = `${profile.code} 市價`;
+
+            // 同步配息開關文字
+            els.dividendToggleTitle.textContent = `${profile.code} ${profile.freqLabel}息再投入`;
+            els.dividendYieldBadge.textContent = `年息 ~${profile.annualYield}%`;
+            els.dividendToggleDesc.textContent = `每逢${scheduleHint} 個月自動模擬現金股息（單次 ${singleYieldPct}%）再買進 ${profile.code} 零股。`;
+
+            // 同步股價快捷鈕
+            const [q1, q2] = profile.quickPrices;
+            els.presetPricePrimary.textContent = q1.label;
+            els.presetPriceSecondary.textContent = q2.label;
+
+            els.startPriceSlider.value = Math.min(250, Math.max(15, state.startPrice));
             els.startPrice.value = state.startPrice;
 
-            // 高亮股價快捷鈕
-            if (state.startPrice === 200) {
-                els.presetPrice200.className = 'px-2 py-0.5 text-[11px] font-bold rounded bg-blue-900 text-white transition';
-                els.presetPrice45.className = 'px-2 py-0.5 text-[11px] font-bold rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
-            } else if (state.startPrice === 45) {
-                els.presetPrice200.className = 'px-2 py-0.5 text-[11px] font-bold rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
-                els.presetPrice45.className = 'px-2 py-0.5 text-[11px] font-bold rounded bg-blue-900 text-white transition';
+            if (Number(state.startPrice) === q1.val) {
+                els.presetPricePrimary.className = 'px-2 py-0.5 text-[11px] font-bold rounded bg-blue-900 text-white transition';
+                els.presetPriceSecondary.className = 'px-2 py-0.5 text-[11px] font-bold rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
+            } else if (Number(state.startPrice) === q2.val) {
+                els.presetPricePrimary.className = 'px-2 py-0.5 text-[11px] font-bold rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
+                els.presetPriceSecondary.className = 'px-2 py-0.5 text-[11px] font-bold rounded bg-blue-900 text-white transition';
             } else {
-                els.presetPrice200.className = 'px-2 py-0.5 text-[11px] font-bold rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
-                els.presetPrice45.className = 'px-2 py-0.5 text-[11px] font-bold rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
+                els.presetPricePrimary.className = 'px-2 py-0.5 text-[11px] font-bold rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
+                els.presetPriceSecondary.className = 'px-2 py-0.5 text-[11px] font-bold rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
             }
+
+            // 同步 ETF 卡片選中狀態
+            document.querySelectorAll('.etf-btn').forEach(btn => {
+                const isSelected = btn.dataset.etf === state.etfCode;
+                if (isSelected) {
+                    btn.className = 'etf-btn text-left p-2.5 rounded-xl border-2 border-emerald-700 bg-white shadow-xs transition';
+                    btn.querySelector('span:first-child').className = 'text-xs font-black text-emerald-950';
+                } else {
+                    btn.className = 'etf-btn text-left p-2.5 rounded-xl border border-slate-200 bg-white hover:border-emerald-500 transition';
+                    btn.querySelector('span:first-child').className = 'text-xs font-black text-slate-800';
+                }
+            });
 
             els.monthlyAmount.value = state.monthlyAmount;
             els.monthlyAmountInput.value = state.monthlyAmount;
@@ -1348,7 +1522,19 @@
             });
         });
 
-        // 0050 股價控制
+        // ETF 標的切換事件（0050 / 00878 / 00919 / 0056）
+        document.querySelectorAll('.etf-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const code = btn.dataset.etf;
+                if (!etfProfiles[code]) return;
+                state.etfCode = code;
+                state.startPrice = etfProfiles[code].defaultPrice;
+                syncControls();
+                updateDashboard();
+            });
+        });
+
+        // ETF 股價控制
         els.startPriceSlider.addEventListener('input', (e) => {
             state.startPrice = Number(e.target.value);
             syncControls();
@@ -1362,13 +1548,13 @@
             syncControls();
             updateDashboard();
         });
-        els.presetPrice200.addEventListener('click', () => {
-            state.startPrice = 200;
+        els.presetPricePrimary.addEventListener('click', () => {
+            state.startPrice = etfProfiles[state.etfCode].quickPrices[0].val;
             syncControls();
             updateDashboard();
         });
-        els.presetPrice45.addEventListener('click', () => {
-            state.startPrice = 45;
+        els.presetPriceSecondary.addEventListener('click', () => {
+            state.startPrice = etfProfiles[state.etfCode].quickPrices[1].val;
             syncControls();
             updateDashboard();
         });
@@ -1445,7 +1631,8 @@
 
         // 重設按鈕
         els.resetBtn.addEventListener('click', () => {
-            state.startPrice = 200;
+            state.etfCode = '0050';
+            state.startPrice = etfProfiles['0050'].defaultPrice;
             state.maxDrop = 30;
             state.bottomMonth = 8;
             state.recoveryMonth = 24;
