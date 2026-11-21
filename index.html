@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台股 0050 (元大台灣50) 股災定期定額微笑曲線模擬器</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts: Inter & Noto Sans TC -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background-color: #f1f5f9;
+            color: #0f172a;
+        }
+        /* 自訂滑桿樣式 */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            background: #e2e8f0;
+            height: 0.45rem;
+            border-radius: 9999px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            margin-top: -5px;
+            background-color: #1e3a8a;
+            height: 1.1rem;
+            width: 1.1rem;
+            border-radius: 9999px;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 5px rgba(15, 23, 42, 0.25);
+            transition: transform 0.15s ease, background-color 0.15s ease;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.12);
+            background-color: #059669;
+        }
+        /* 自訂捲軸 */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <!-- 頂部深藍金融導覽列 -->
+    <header class="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white shadow-lg sticky top-0 z-30 border-b border-blue-900/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center shadow-md shrink-0">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h1 class="text-base sm:text-xl font-extrabold tracking-tight">台股 0050 (元大台灣50) 股災定期定額微笑曲線模擬器</h1>
+                        <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">0050 零股實戰版</span>
+                    </div>
+                    <p class="text-xs text-slate-300 mt-0.5">整合百年重大股災情境一鍵模擬與四種低檔加碼投資策略雙軌對照</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+                <button id="resetBtn" type="button" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-100 text-xs font-semibold border border-white/15 transition flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    重設為預設情境
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要內容區 -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- 策略對照效益橫幅（即時顯示純定期定額 vs 目前加碼策略雙軌對比） -->
+        <section id="strategyBanner" class="bg-gradient-to-r from-blue-950 via-slate-900 to-emerald-950 text-white rounded-2xl p-4 sm:p-5 shadow-md border border-blue-800/60">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div class="space-y-1.5 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span id="activeStrategyPill" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-500 text-slate-950">
+                            模式 A：純定期定額（基準線）
+                        </span>
+                        <span id="dividendPill" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white/10 text-emerald-300 border border-emerald-400/30">
+                            含 0050 半年配息再投入
+                        </span>
+                    </div>
+                    <p id="insightSummaryText" class="text-sm text-slate-200 leading-relaxed pt-1">
+                        正在計算 0050 微笑曲線試算結果...
+                    </p>
+                </div>
+
+                <!-- 雙軌策略對照卡片（當選擇 B/C/D 加碼策略時高亮顯示提前月數與多賺金額） -->
+                <div id="comparisonCard" class="shrink-0 bg-white/10 backdrop-blur-xs border border-white/15 rounded-xl p-3.5 sm:min-w-[310px]">
+                    <div class="text-[11px] font-bold text-amber-300 uppercase tracking-wider flex items-center justify-between">
+                        <span>⚡ 相較於「純定期定額」效益對照</span>
+                        <span id="compareTag" class="px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-200 text-[10px]">基準對照</span>
+                    </div>
+                    <div id="comparisonMetrics" class="mt-2 grid grid-cols-2 gap-3">
+                        <div>
+                            <div class="text-[11px] text-slate-300">回本時間對比</div>
+                            <div id="compareBreakevenVal" class="text-sm sm:text-base font-extrabold text-white mt-0.5">第 15 個月</div>
+                            <div id="compareBreakevenSub" class="text-[11px] text-emerald-300">基準無加碼模式</div>
+                        </div>
+                        <div class="border-l border-white/15 pl-3">
+                            <div class="text-[11px] text-slate-300">回前高總獲利差額</div>
+                            <div id="compareProfitVal" class="text-sm sm:text-base font-extrabold text-emerald-400 mt-0.5">NT$ 0</div>
+                            <div id="compareProfitSub" class="text-[11px] text-slate-300">切換 B/C/D 查看加速效果</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 主體兩欄網格：左側控制台 (4欄) + 右側儀表板 (8欄) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- 左側參數與策略控制面板 -->
+            <aside class="lg:col-span-4 space-y-5">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-5 space-y-5">
+
+                    <!-- 1. 歷史股災一鍵套用區塊（置於左側面板最上方） -->
+                    <div class="p-3.5 rounded-xl bg-blue-50/80 border border-blue-200 space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-xs font-extrabold text-blue-950 flex items-center gap-1.5">
+                                <svg class="w-4 h-4 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                歷史股災一鍵套用（0050 實證）
+                            </h2>
+                            <span class="text-[10px] font-bold text-blue-700 bg-white px-2 py-0.5 rounded-full border border-blue-200">點擊套用</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" data-preset="default" class="preset-btn text-left p-2.5 rounded-xl border-2 border-blue-900 bg-white shadow-xs transition">
+                                <div class="text-xs font-extrabold text-blue-950">預設基準情境</div>
+                                <div class="text-[11px] text-blue-700 mt-0.5">跌30% / 8月底 / 24月回</div>
+                            </button>
+                            <button type="button" data-preset="covid2020" class="preset-btn text-left p-2.5 rounded-xl border border-slate-200 bg-white hover:border-blue-500 transition">
+                                <div class="text-xs font-bold text-slate-800">2020 疫情股災</div>
+                                <div class="text-[11px] text-slate-500 mt-0.5">跌34% / 2月底 / 5月回</div>
+                            </button>
+                            <button type="button" data-preset="bear2022" class="preset-btn text-left p-2.5 rounded-xl border border-slate-200 bg-white hover:border-blue-500 transition">
+                                <div class="text-xs font-bold text-slate-800">2022 升息熊市</div>
+                                <div class="text-[11px] text-slate-500 mt-0.5">跌25% / 9月底 / 24月回</div>
+                            </button>
+                            <button type="button" data-preset="gfc2008" class="preset-btn text-left p-2.5 rounded-xl border border-slate-200 bg-white hover:border-blue-500 transition">
+                                <div class="text-xs font-bold text-slate-800">2008 金融海嘯</div>
+                                <div class="text-[11px] text-slate-500 mt-0.5">跌57% / 17月底 / 65月回</div>
+                            </button>
+                        </div>
+
+                        <div id="presetHistoryNote" class="p-2.5 rounded-lg bg-white/90 border border-blue-100 text-[11px] text-slate-600 leading-relaxed">
+                            <strong class="text-blue-950">📌 預設基準（跌 30% / 第 8 月見底 / 24 月回前高）：</strong>模擬標準中度熊市循環，前 8 個月逐步築底、後 16 個月溫和復甦，最適合觀察定期定額微笑曲線的成本鈍化與提前回本效應。
+                        </div>
+                    </div>
+
+                    <!-- 2. 進階加碼投資策略選擇器（五種模式切換與即時比較） -->
+                    <div class="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200/90 space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-xs font-extrabold text-amber-950 flex items-center gap-1.5">
+                                <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                                投資策略對照（雙軌即時比較）
+                            </h2>
+                            <span class="text-[10px] font-bold text-amber-800 bg-amber-200/70 px-2 py-0.5 rounded-full">雙軌即時比較</span>
+                        </div>
+
+                        <div class="space-y-1.5" id="strategySelectorGroup">
+                            <label class="strategy-option flex items-start gap-2.5 p-2 rounded-lg border-2 border-amber-600 bg-white cursor-pointer transition">
+                                <input type="radio" name="dcaStrategy" value="A" checked class="mt-0.5 accent-amber-600">
+                                <div class="text-xs">
+                                    <div class="font-extrabold text-slate-900">模式 A：純定期定額（基準線）</div>
+                                    <div class="text-[11px] text-slate-500">無論漲跌，每月固定扣款 100% 金額</div>
+                                </div>
+                            </label>
+
+                            <label class="strategy-option flex items-start gap-2.5 p-2 rounded-lg border border-slate-200 bg-white hover:border-amber-400 cursor-pointer transition">
+                                <input type="radio" name="dcaStrategy" value="B" class="mt-0.5 accent-amber-600">
+                                <div class="text-xs">
+                                    <div class="font-bold text-slate-800">模式 B：低檔單級加碼（+50%）</div>
+                                    <div class="text-[11px] text-slate-500">跌幅 &gt; 20% 時，當月扣款提高至 150%</div>
+                                </div>
+                            </label>
+
+                            <label class="strategy-option flex items-start gap-2.5 p-2 rounded-lg border border-slate-200 bg-white hover:border-amber-400 cursor-pointer transition">
+                                <input type="radio" name="dcaStrategy" value="C" class="mt-0.5 accent-amber-600">
+                                <div class="text-xs">
+                                    <div class="font-bold text-slate-800">模式 C：金字塔階梯加碼（越跌買越多）</div>
+                                    <div class="text-[11px] text-slate-500">跌15%加碼30%、跌25%加碼60%、跌35%加碼100%</div>
+                                </div>
+                            </label>
+
+                            <label class="strategy-option flex items-start gap-2.5 p-2 rounded-lg border border-slate-200 bg-white hover:border-amber-400 cursor-pointer transition">
+                                <input type="radio" name="dcaStrategy" value="D" class="mt-0.5 accent-amber-600">
+                                <div class="text-xs">
+                                    <div class="font-bold text-slate-800">模式 D：越跌越買加倍扣（200%）</div>
+                                    <div class="text-[11px] text-slate-500">跌幅 &gt; 20% 時，當月扣款直接加倍至 200%</div>
+                                </div>
+                            </label>
+
+                            <label class="strategy-option strategy-warning flex items-start gap-2.5 p-2 rounded-lg border border-rose-300 bg-rose-50/70 hover:border-rose-500 cursor-pointer transition">
+                                <input type="radio" name="dcaStrategy" value="E" class="mt-0.5 accent-rose-600">
+                                <div class="text-xs flex-1">
+                                    <div class="flex items-center justify-between gap-1 flex-wrap">
+                                        <span class="font-extrabold text-rose-900">模式 E：跌超過 20% 停止扣款</span>
+                                        <span class="text-[10px] font-extrabold px-1.5 py-0.2 rounded bg-rose-600 text-white">反面教材對照</span>
+                                    </div>
+                                    <div class="text-[11px] text-rose-700 mt-0.5">跌幅 &gt; 20% 期間停止投入 ($0)，直到回升至跌幅 ≤ 20% 才恢復正常扣款</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 3. 0050 起始股價基準設定 -->
+                    <div class="space-y-2 pt-1 border-t border-slate-100">
+                        <div class="flex items-center justify-between">
+                            <label for="startPrice" class="text-xs font-bold text-slate-700">0050 起始高點股價 (元)</label>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" id="presetPrice200" class="px-2 py-0.5 text-[11px] font-bold rounded bg-blue-900 text-white transition">200 元基準</button>
+                                <button type="button" id="presetPrice45" class="px-2 py-0.5 text-[11px] font-bold rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition">拆股參考 45 元</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <input type="range" id="startPriceSlider" min="30" max="250" step="5" value="200" class="flex-1">
+                            <input type="number" id="startPrice" min="10" max="500" step="1" value="200" class="w-20 px-2 py-1 text-sm font-extrabold text-right text-blue-950 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        </div>
+                    </div>
+
+                    <!-- 4. 每月定期定額金額（滑桿＋數字輸入框） -->
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between items-center">
+                            <label for="monthlyAmount" class="text-xs font-bold text-slate-700">每月定期定額基準金額</label>
+                            <div class="relative w-32">
+                                <span class="absolute left-2.5 top-1 text-xs font-bold text-blue-900">NT$</span>
+                                <input type="number" id="monthlyAmountInput" min="3000" max="100000" step="1000" value="10000" class="w-full pl-9 pr-2 py-0.5 text-sm font-extrabold text-right text-blue-950 bg-blue-50 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                        </div>
+                        <input type="range" id="monthlyAmount" min="3000" max="100000" step="1000" value="10000" class="w-full">
+                        <div class="flex justify-between text-[10px] text-slate-400">
+                            <span>NT$ 3,000</span>
+                            <span>NT$ 50,000</span>
+                            <span>NT$ 100,000</span>
+                        </div>
+                    </div>
+
+                    <!-- 5. 最大下跌百分比 -->
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between items-center">
+                            <label for="maxDrop" class="text-xs font-bold text-slate-700">股市最大下跌百分比</label>
+                            <span id="maxDropVal" class="text-xs font-extrabold text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-md border border-rose-200">-30%</span>
+                        </div>
+                        <input type="range" id="maxDrop" min="10" max="60" step="1" value="30" class="w-full">
+                        <div class="flex justify-between text-[10px] text-slate-400">
+                            <span>-10% (盤整修正)</span>
+                            <span>-30% (熊市)</span>
+                            <span>-60% (金融海嘯)</span>
+                        </div>
+                    </div>
+
+                    <!-- 6. 見底時間（月） -->
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between items-center">
+                            <label for="bottomMonth" class="text-xs font-bold text-slate-700">跌至谷底見底時間</label>
+                            <span id="bottomMonthVal" class="text-xs font-extrabold text-slate-800 bg-slate-100 px-2.5 py-0.5 rounded-md">第 8 個月</span>
+                        </div>
+                        <input type="range" id="bottomMonth" min="1" max="24" step="1" value="8" class="w-full">
+                        <div class="flex justify-between text-[10px] text-slate-400">
+                            <span>1 個月 (急跌)</span>
+                            <span>12 個月</span>
+                            <span>24 個月 (緩跌)</span>
+                        </div>
+                    </div>
+
+                    <!-- 7. 反彈回前高總時間（月） -->
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between items-center">
+                            <label for="recoveryMonth" class="text-xs font-bold text-slate-700">反彈漲回前高總時間</label>
+                            <span id="recoveryMonthVal" class="text-xs font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200">第 24 個月 (2.0年)</span>
+                        </div>
+                        <input type="range" id="recoveryMonth" min="4" max="72" step="1" value="24" class="w-full">
+                        <div class="flex justify-between text-[10px] text-slate-400">
+                            <span>4 個月</span>
+                            <span>36 個月 (3年)</span>
+                            <span>72 個月 (6年)</span>
+                        </div>
+                    </div>
+
+                    <!-- 8. 0050 半年配息再投入開關 -->
+                    <div class="pt-3 border-t border-slate-100">
+                        <div class="flex items-start justify-between gap-3 p-3 rounded-xl bg-emerald-50/80 border border-emerald-200">
+                            <div class="space-y-0.5">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-xs font-extrabold text-slate-800">0050 半年配息再投入</span>
+                                    <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-emerald-200 text-emerald-900">年息 ~3.2%</span>
+                                </div>
+                                <p class="text-[11px] text-slate-600 leading-snug">
+                                    每逢第 6、12、18... 個月自動模擬現金股息（單次 1.6%）再買進 0050 零股。
+                                </p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer shrink-0 mt-1">
+                                <input type="checkbox" id="dividendToggle" class="sr-only peer" checked>
+                                <div class="w-10 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+            </aside>
+
+            <!-- 右側視覺化儀表板 (8欄) -->
+            <section class="lg:col-span-8 space-y-6">
+
+                <!-- 四大核心指標 KPI 卡片 -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                    <!-- KPI 1: 正式回本時間 -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-4 sm:p-5 relative overflow-hidden flex flex-col justify-between">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-emerald-500/10 rounded-bl-full -mr-4 -mt-4"></div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">1. 正式回本時間</p>
+                            <div class="mt-2 flex items-baseline gap-1.5 flex-wrap">
+                                <span id="kpiBreakevenMonth" class="text-2xl font-black text-emerald-600">第 15 個月</span>
+                                <span id="kpiBreakevenPrice" class="text-xs font-semibold text-slate-500">(市價 162.8元)</span>
+                            </div>
+                        </div>
+                        <div class="mt-3 pt-2.5 border-t border-slate-100">
+                            <span id="kpiBreakevenDiff" class="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
+                                ⚡ 比大盤回高提前 9 個月
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- KPI 2: 最低平均成本 -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-4 sm:p-5 relative overflow-hidden flex flex-col justify-between">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-blue-600/10 rounded-bl-full -mr-4 -mt-4"></div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">2. 最低平均成本</p>
+                            <div class="mt-2 flex items-baseline gap-1.5 flex-wrap">
+                                <span id="kpiLowestAvgCost" class="text-2xl font-black text-blue-950">159.4 元</span>
+                                <span id="kpiCostDiscount" class="text-xs font-extrabold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded">約 80 折</span>
+                            </div>
+                        </div>
+                        <div class="mt-3 pt-2.5 border-t border-slate-100 text-[11px] text-slate-500 flex items-center justify-between">
+                            <span id="kpiLowestCostMonth">第 12 個月最低</span>
+                            <span id="kpiBottomPriceHint" class="font-bold text-rose-600">谷底 140.0元</span>
+                        </div>
+                    </div>
+
+                    <!-- KPI 3: 回前高總投入本金 -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-4 sm:p-5 relative overflow-hidden flex flex-col justify-between">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-amber-500/10 rounded-bl-full -mr-4 -mt-4"></div>
+                        <div>
+                            <p id="kpiPrincipalTitle" class="text-xs font-bold text-slate-500 uppercase tracking-wider">3. 回前高總投入本金</p>
+                            <div class="mt-2">
+                                <span id="kpiTotalPrincipal" class="text-2xl font-black text-slate-800">NT$ 240,000</span>
+                            </div>
+                        </div>
+                        <div class="mt-3 pt-2.5 border-t border-slate-100 text-[11px] flex items-center justify-between">
+                            <span id="kpiBoostExtraInfo" class="text-slate-500">純定期定額本金</span>
+                            <span id="kpiTotalSharesHint" class="font-bold text-blue-900 bg-blue-50 px-1.5 py-0.5 rounded">1,458.2 股</span>
+                        </div>
+                    </div>
+
+                    <!-- KPI 4: 回前高總市值與報酬率 -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-4 sm:p-5 relative overflow-hidden flex flex-col justify-between">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-indigo-500/10 rounded-bl-full -mr-4 -mt-4"></div>
+                        <div>
+                            <p id="kpiRecoveryTitle" class="text-xs font-bold text-slate-500 uppercase tracking-wider">4. 回前高帳面總市值</p>
+                            <div class="mt-2">
+                                <span id="kpiRecoveryValue" class="text-2xl font-black text-slate-900">NT$ 291,640</span>
+                            </div>
+                        </div>
+                        <div class="mt-3 pt-2.5 border-t border-slate-100 text-[11px] flex items-center justify-between">
+                            <span class="text-slate-500">總獲利 / 報酬率</span>
+                            <span id="kpiRecoveryProfit" class="font-extrabold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">+51,640 (+21.5%)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 雙視角 Chart.js 互動主圖表卡片 -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-5 sm:p-6 space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                        <div>
+                            <h3 id="chartTitle" class="text-base font-extrabold text-slate-900">微笑曲線成本對照圖：0050 市價 vs. 平均持有成本</h3>
+                            <p id="chartSubtitle" class="text-xs text-slate-500 mt-0.5">藍線向上穿越成本線即為回本轉正點；切換加碼策略可同步比較虛線(基準)與實線(加碼)的成本下壓幅度</p>
+                        </div>
+
+                        <!-- 雙視角切換按鈕 -->
+                        <div class="inline-flex rounded-xl bg-slate-100 p-1 self-start sm:self-center shrink-0">
+                            <button type="button" id="tabChartPrice" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-blue-950 text-white shadow-xs transition">
+                                微笑曲線成本對照
+                            </button>
+                            <button type="button" id="tabChartAsset" class="px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 hover:text-slate-900 transition">
+                                累積本金與市值成長
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 圖例列 -->
+                    <div id="legendPriceMode" class="flex flex-wrap items-center gap-4 text-xs">
+                        <span class="flex items-center gap-1.5 font-semibold text-slate-700">
+                            <span class="w-3 h-3 rounded-full bg-blue-600 inline-block"></span>0050 市場股價
+                        </span>
+                        <span id="legendActiveCostItem" class="flex items-center gap-1.5 font-semibold text-slate-700">
+                            <span id="legendActiveCostLine" class="w-3.5 h-1 bg-amber-500 inline-block rounded"></span>
+                            <span id="legendActiveCostText">目前策略平均成本</span>
+                        </span>
+                        <span id="legendBaseCostItem" class="hidden flex items-center gap-1.5 font-medium text-slate-500">
+                            <span class="w-3.5 h-0.5 border-t-2 border-dashed border-slate-400 inline-block"></span>純定期定額平均成本(基準)
+                        </span>
+                        <span class="flex items-center gap-1.5 font-bold text-emerald-700">
+                            <span class="w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-emerald-200 inline-block"></span>正式回本交叉點
+                        </span>
+                    </div>
+
+                    <div id="legendAssetMode" class="hidden flex flex-wrap items-center gap-4 text-xs">
+                        <span class="flex items-center gap-1.5 font-semibold text-slate-700">
+                            <span class="w-3 h-3 rounded-sm bg-emerald-500 inline-block"></span>目前策略帳面總市值
+                        </span>
+                        <span class="flex items-center gap-1.5 font-semibold text-slate-700">
+                            <span class="w-3.5 h-0.5 border-t-2 border-dashed border-slate-500 inline-block"></span>目前策略累積本金
+                        </span>
+                        <span id="legendBaseAssetItem" class="hidden flex items-center gap-1.5 font-medium text-blue-600">
+                            <span class="w-3.5 h-0.5 border-t-2 border-dotted border-blue-500 inline-block"></span>純定期定額總市值(對照)
+                        </span>
+                    </div>
+
+                    <!-- 圖表畫布 -->
+                    <div class="relative w-full h-72 sm:h-80">
+                        <canvas id="mainSimChart"></canvas>
+                    </div>
+
+                    <!-- 三階段微笑曲線里程碑摘要列 -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-100 text-xs">
+                        <div class="p-2.5 rounded-xl bg-rose-50/70 border border-rose-100">
+                            <div class="font-bold text-rose-800">階段一：空頭築底期</div>
+                            <div id="milestonePhase1" class="text-slate-600 mt-0.5">第 1～8 月下跌 -30%，低檔累積大量便宜零股</div>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-100">
+                            <div class="font-bold text-emerald-800">階段二：黃金交叉回本</div>
+                            <div id="milestonePhase2" class="text-slate-600 mt-0.5">第 15 個月正式回本轉正，比大盤提前 9 個月</div>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-blue-50/70 border border-blue-100">
+                            <div class="font-bold text-blue-900">階段三：重返前高收割</div>
+                            <div id="milestonePhase3" class="text-slate-600 mt-0.5">第 24 個月大盤回前高，累積報酬率達 +21.5%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 逐月定期定額明細表與 CSV 匯出 -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/90 overflow-hidden">
+                    <div class="p-4 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 bg-slate-50/70">
+                        <div>
+                            <h3 class="text-sm sm:text-base font-extrabold text-slate-900 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                0050 逐月定期定額零股累積與損益明細表
+                            </h3>
+                            <p class="text-xs text-slate-500 mt-0.5">綠色高亮列為「正式回本轉正」月份（模擬至漲回前高後 6 個月）</p>
+                        </div>
+                        <div class="flex items-center gap-2 self-start sm:self-center">
+                            <button type="button" id="exportCsvBtn" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition flex items-center gap-1.5 shadow-xs">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                </svg>
+                                匯出 CSV
+                            </button>
+                            <button type="button" id="toggleTableBtn" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition flex items-center gap-1">
+                                <span id="toggleTableText">收合明細</span>
+                                <svg id="toggleTableIcon" class="w-3.5 h-3.5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="tableContainer" class="overflow-x-auto max-h-[450px] custom-scrollbar">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-slate-100 sticky top-0 z-10 text-[11px] font-bold text-slate-600 uppercase tracking-wider border-b border-slate-200">
+                                <tr>
+                                    <th class="py-3 px-3.5 whitespace-nowrap">月份</th>
+                                    <th class="py-3 px-3.5 whitespace-nowrap text-right">0050 市價</th>
+                                    <th class="py-3 px-3.5 whitespace-nowrap text-right">距前高跌幅</th>
+                                    <th class="py-3 px-3.5 whitespace-nowrap text-right">當月投入</th>
+                                    <th class="py-3 px-3.5 whitespace-nowrap text-right">買進零股</th>
+                                    <th class="py-3 px-3.5 whitespace-nowrap text-right">配息再投股</th>
+                                    <th class="py-3 px-3.5 whitespace-nowrap text-right">累積總股數</th>
+                                    <th class="py-3 px-3.5 whitespace-nowrap text-right">平均成本</th>
+                                    <th class="py-3 px-3.5 whitespace-nowrap text-right">累積本金</th>
+                                    <th class="py-3 px-3.5 whitespace-nowrap text-right">帳面總市值</th>
+                                    <th class="py-3 px-3.5 whitespace-nowrap text-right">累積報酬率</th>
+                                    <th class="py-3 px-3.5 whitespace-nowrap text-center">狀態</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ledgerBody" class="divide-y divide-slate-100 text-xs sm:text-sm">
+                                <!-- 由 JavaScript 動態產生 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+
+    </main>
+
+    <!-- 頁尾免責說明 -->
+    <footer class="bg-white border-t border-slate-200 py-4 mt-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
+            <p>註：本模擬器採 U 型微笑曲線路徑試算台股 0050 零股定期定額（精確至小數點後 2 位），未計入券商手續費與證交稅；歷史數據僅供紀律投資參考。</p>
+            <p class="shrink-0 font-medium text-slate-500">台股 0050 長期投資紀律模擬工具</p>
+        </div>
+    </footer>
+
+    <script>
+        // ==========================================
+        // 1. 狀態定義與 DOM 元素綁定
+        // ==========================================
+        const state = {
+            startPrice: 200,
+            maxDrop: 30,
+            bottomMonth: 8,
+            recoveryMonth: 24,
+            monthlyAmount: 10000,
+            strategy: 'A',        // 'A' | 'B' | 'C' | 'D'
+            dividendEnabled: true,
+            chartTab: 'price',    // 'price' | 'asset'
+            activePreset: 'default'
+        };
+
+        const strategyMeta = {
+            A: {
+                code: 'A',
+                shortName: '模式 A：純定期定額（基準線）',
+                badgeText: '模式 A：純定期定額（基準線）'
+            },
+            B: {
+                code: 'B',
+                shortName: '模式 B：低檔單級加碼 (+50%)',
+                badgeText: '模式 B：跌破20%加碼50%'
+            },
+            C: {
+                code: 'C',
+                shortName: '模式 C：金字塔階梯加碼',
+                badgeText: '模式 C：金字塔階梯加碼 (30%/60%/100%)'
+            },
+            D: {
+                code: 'D',
+                shortName: '模式 D：越跌越買加倍扣 (200%)',
+                badgeText: '模式 D：跌破20%直接加倍扣 (200%)'
+            },
+            E: {
+                code: 'E',
+                shortName: '模式 E：跌逾20%停止扣款',
+                badgeText: '⚠️ 模式 E：跌逾20%恐慌停扣（反面教材）'
+            }
+        };
+
+        const presetDescriptions = {
+            default: '<strong class="text-blue-950">📌 預設基準（跌 30% / 第 8 月見底 / 24 月回前高）：</strong>模擬標準中度熊市循環，前 8 個月逐步築底、後 16 個月溫和復甦，最適合觀察定期定額微笑曲線的成本鈍化與提前回本效應。',
+            covid2020: '<strong class="text-blue-950">📌 2020 疫情股災（跌 34% / 第 2 月見底 / 5 月回前高）：</strong>2020 年初新冠疫情爆發使台股 0050 短線急挫約 34%，隨後受惠全球央行寬鬆與半導體需求呈現 V 型急彈，僅約 5 個月即迅速創高。',
+            bear2022: '<strong class="text-blue-950">📌 2022 升息熊市（跌 25% / 第 9 月見底 / 24 月回前高）：</strong>聯準會激進升息與電子業庫存調整使 0050 經歷 9 個月修正，堅持定期定額者在 2023 下半年 AI 浪潮啟動時即遠早於指數回前高率先大幅獲利。',
+            gfc2008: '<strong class="text-blue-950">📌 2008 金融海嘯（跌 57% / 第 17 月見底 / 65 月回前高）：</strong>百年級金融危機使 0050 腰斬逾半，考驗長達 5 年半的紀律耐心；但在深度低檔累積的大量便宜零股，使定期定額回本時間縮短至單筆投資的一半以下。'
+        };
+
+        const els = {
+            startPriceSlider: document.getElementById('startPriceSlider'),
+            startPrice: document.getElementById('startPrice'),
+            presetPrice200: document.getElementById('presetPrice200'),
+            presetPrice45: document.getElementById('presetPrice45'),
+            presetHistoryNote: document.getElementById('presetHistoryNote'),
+            monthlyAmount: document.getElementById('monthlyAmount'),
+            monthlyAmountInput: document.getElementById('monthlyAmountInput'),
+            maxDrop: document.getElementById('maxDrop'),
+            maxDropVal: document.getElementById('maxDropVal'),
+            bottomMonth: document.getElementById('bottomMonth'),
+            bottomMonthVal: document.getElementById('bottomMonthVal'),
+            recoveryMonth: document.getElementById('recoveryMonth'),
+            recoveryMonthVal: document.getElementById('recoveryMonthVal'),
+            dividendToggle: document.getElementById('dividendToggle'),
+            resetBtn: document.getElementById('resetBtn'),
+            // 橫幅與效益對照
+            strategyBanner: document.getElementById('strategyBanner'),
+            activeStrategyPill: document.getElementById('activeStrategyPill'),
+            dividendPill: document.getElementById('dividendPill'),
+            insightSummaryText: document.getElementById('insightSummaryText'),
+            comparisonCard: document.getElementById('comparisonCard'),
+            compareTag: document.getElementById('compareTag'),
+            compareBreakevenVal: document.getElementById('compareBreakevenVal'),
+            compareBreakevenSub: document.getElementById('compareBreakevenSub'),
+            compareProfitVal: document.getElementById('compareProfitVal'),
+            compareProfitSub: document.getElementById('compareProfitSub'),
+            // KPI
+            kpiBreakevenMonth: document.getElementById('kpiBreakevenMonth'),
+            kpiBreakevenPrice: document.getElementById('kpiBreakevenPrice'),
+            kpiBreakevenDiff: document.getElementById('kpiBreakevenDiff'),
+            kpiLowestAvgCost: document.getElementById('kpiLowestAvgCost'),
+            kpiCostDiscount: document.getElementById('kpiCostDiscount'),
+            kpiLowestCostMonth: document.getElementById('kpiLowestCostMonth'),
+            kpiBottomPriceHint: document.getElementById('kpiBottomPriceHint'),
+            kpiPrincipalTitle: document.getElementById('kpiPrincipalTitle'),
+            kpiTotalPrincipal: document.getElementById('kpiTotalPrincipal'),
+            kpiBoostExtraInfo: document.getElementById('kpiBoostExtraInfo'),
+            kpiTotalSharesHint: document.getElementById('kpiTotalSharesHint'),
+            kpiRecoveryTitle: document.getElementById('kpiRecoveryTitle'),
+            kpiRecoveryValue: document.getElementById('kpiRecoveryValue'),
+            kpiRecoveryProfit: document.getElementById('kpiRecoveryProfit'),
+            // 圖表與里程碑
+            tabChartPrice: document.getElementById('tabChartPrice'),
+            tabChartAsset: document.getElementById('tabChartAsset'),
+            chartTitle: document.getElementById('chartTitle'),
+            chartSubtitle: document.getElementById('chartSubtitle'),
+            legendPriceMode: document.getElementById('legendPriceMode'),
+            legendActiveCostLine: document.getElementById('legendActiveCostLine'),
+            legendActiveCostText: document.getElementById('legendActiveCostText'),
+            legendBaseCostItem: document.getElementById('legendBaseCostItem'),
+            legendAssetMode: document.getElementById('legendAssetMode'),
+            legendBaseAssetItem: document.getElementById('legendBaseAssetItem'),
+            milestonePhase1: document.getElementById('milestonePhase1'),
+            milestonePhase2: document.getElementById('milestonePhase2'),
+            milestonePhase3: document.getElementById('milestonePhase3'),
+            // 表格與 CSV
+            ledgerBody: document.getElementById('ledgerBody'),
+            exportCsvBtn: document.getElementById('exportCsvBtn'),
+            toggleTableBtn: document.getElementById('toggleTableBtn'),
+            toggleTableText: document.getElementById('toggleTableText'),
+            toggleTableIcon: document.getElementById('toggleTableIcon'),
+            tableContainer: document.getElementById('tableContainer')
+        };
+
+        let mainSimChart = null;
+        let lastActiveRecords = [];
+
+        const fmtInt = (n) => Math.round(n).toLocaleString('zh-TW');
+        const fmtDec = (n, d = 2) => Number(n).toLocaleString('zh-TW', {
+            minimumFractionDigits: d,
+            maximumFractionDigits: d
+        });
+
+        // ==========================================
+        // 2. 加碼倍數計算與雙軌模擬引擎
+        // ==========================================
+        function getStrategyMultiplier(strategyCode, drawdownPct) {
+            // drawdownPct 為負數，例如 -25 代表下跌 25%
+            const drop = Math.abs(Math.min(0, drawdownPct));
+            if (strategyCode === 'A') {
+                return { mult: 1.0, label: '' };
+            }
+            if (strategyCode === 'B') {
+                if (drop > 20.0001) return { mult: 1.5, label: '+50%' };
+                return { mult: 1.0, label: '' };
+            }
+            if (strategyCode === 'C') {
+                // 金字塔階梯加碼：跌15%加碼30%、跌25%加碼60%、跌35%加碼100%
+                if (drop >= 35.0) return { mult: 2.0, label: '+100%' };
+                if (drop >= 25.0) return { mult: 1.6, label: '+60%' };
+                if (drop >= 15.0) return { mult: 1.3, label: '+30%' };
+                return { mult: 1.0, label: '' };
+            }
+            if (strategyCode === 'D') {
+                if (drop > 20.0001) return { mult: 2.0, label: '加倍200%', isPaused: false };
+                return { mult: 1.0, label: '', isPaused: false };
+            }
+            if (strategyCode === 'E') {
+                // 跌幅 > 20% 期間停止投入 ($0)，直到回升至跌幅 <= 20% 才恢復正常扣款
+                if (drop > 20.0001) return { mult: 0.0, label: '跌逾20%停扣', isPaused: true };
+                return { mult: 1.0, label: '', isPaused: false };
+            }
+            return { mult: 1.0, label: '', isPaused: false };
+        }
+
+        function simulateSingleStrategy(strategyCode) {
+            const { startPrice, maxDrop, bottomMonth, recoveryMonth, monthlyAmount, dividendEnabled } = state;
+            const bottomPrice = startPrice * (1 - maxDrop / 100);
+            const totalMonths = recoveryMonth + 6;
+            const postRecoveryMonthlyGrowth = Math.pow(1.08, 1 / 12) - 1;
+
+            const records = [];
+            let cumShares = 0;
+            let cumPrincipal = 0;
+            let lowestAvgCost = Infinity;
+            let lowestAvgCostMonth = 1;
+            let breakevenMonth = null;
+
+            for (let m = 1; m <= totalMonths; m++) {
+                // 1. 計算當月 U 型平滑微笑曲線 0050 市價
+                let price = startPrice;
+                if (m <= bottomMonth) {
+                    const t = m / bottomMonth;
+                    const ease = (1 - Math.cos(t * Math.PI)) / 2;
+                    price = startPrice - (startPrice - bottomPrice) * ease;
+                } else if (m <= recoveryMonth) {
+                    const t = (m - bottomMonth) / (recoveryMonth - bottomMonth);
+                    const ease = (1 - Math.cos(t * Math.PI)) / 2;
+                    price = bottomPrice + (startPrice - bottomPrice) * ease;
+                } else {
+                    const extraM = m - recoveryMonth;
+                    price = startPrice * Math.pow(1 + postRecoveryMonthlyGrowth, extraM);
+                }
+
+                const drawdownPct = ((price - startPrice) / startPrice) * 100;
+
+                // 2. 0050 半年配息再投入（每逢第 6、12、18... 個月配發 1.6% 現金股息自動買回零股）
+                let dividendCash = 0;
+                let dividendShares = 0;
+                if (dividendEnabled && (m % 6 === 0)) {
+                    dividendCash = cumShares * price * 0.016;
+                    dividendShares = dividendCash / price;
+                    cumShares += dividendShares;
+                }
+
+                // 3. 依據所選策略計算當月投入金額與買進零股數（精確至小數點後 2 位概念）
+                const { mult, label: boostLabel, isPaused } = getStrategyMultiplier(strategyCode, drawdownPct);
+                const investedThisMonth = monthlyAmount * mult;
+                const sharesBought = investedThisMonth / price;
+
+                cumShares += sharesBought;
+                cumPrincipal += investedThisMonth;
+
+                const avgCost = cumPrincipal / cumShares;
+                const marketValue = cumShares * price;
+                const profit = marketValue - cumPrincipal;
+                const roiPct = (profit / cumPrincipal) * 100;
+
+                if (avgCost < lowestAvgCost) {
+                    lowestAvgCost = avgCost;
+                    lowestAvgCostMonth = m;
+                }
+
+                // 判斷是否為經歷帳面虧損後重新站上成本線的「正式回本」月份
+                const hadDrawdownBefore = records.some(r => r.profit < -0.01);
+                const isProfitable = profit >= -0.01;
+                let isBreakevenPoint = false;
+
+                if (breakevenMonth === null && hadDrawdownBefore && isProfitable) {
+                    breakevenMonth = m;
+                    isBreakevenPoint = true;
+                }
+
+                records.push({
+                    month: m,
+                    price,
+                    drawdownPct,
+                    investedThisMonth,
+                    boostLabel,
+                    isPaused,
+                    sharesBought,
+                    dividendShares,
+                    cumShares,
+                    avgCost,
+                    cumPrincipal,
+                    marketValue,
+                    profit,
+                    roiPct,
+                    isProfitable,
+                    isBreakevenPoint,
+                    isBottom: m === bottomMonth,
+                    isRecovery: m === recoveryMonth
+                });
+            }
+
+            return {
+                strategyCode,
+                records,
+                bottomPrice,
+                lowestAvgCost,
+                lowestAvgCostMonth,
+                breakevenMonth: breakevenMonth || recoveryMonth,
+                recoveryRecord: records[recoveryMonth - 1]
+            };
+        }
+
+        // ==========================================
+        // 3. 更新整體儀表板 UI 與雙軌效益對照
+        // ==========================================
+        function updateDashboard() {
+            // 同時執行基準線（模式 A）與目前選定策略（Active）的雙軌模擬
+            const baseSim = simulateSingleStrategy('A');
+            const activeSim = state.strategy === 'A' ? baseSim : simulateSingleStrategy(state.strategy);
+            lastActiveRecords = activeSim.records;
+
+            const { records, bottomPrice, lowestAvgCost, lowestAvgCostMonth, breakevenMonth, recoveryRecord } = activeSim;
+            const beRecord = records[breakevenMonth - 1];
+            const isCompareMode = state.strategy !== 'A';
+            const isStopDcaMode = state.strategy === 'E';
+            const pausedMonthsCount = records.filter(r => r.isPaused).length;
+
+            // 1. 更新頂部橫幅策略標籤、背景色與摘要文案
+            els.activeStrategyPill.textContent = strategyMeta[state.strategy].badgeText;
+            if (isStopDcaMode) {
+                els.strategyBanner.className = 'bg-gradient-to-r from-rose-950 via-red-900 to-amber-950 text-white rounded-2xl p-4 sm:p-5 shadow-md border border-rose-500/70';
+                els.activeStrategyPill.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-rose-500 text-white shadow-xs';
+                els.comparisonCard.className = 'shrink-0 bg-rose-950/70 backdrop-blur-xs border border-rose-400/50 rounded-xl p-3.5 sm:min-w-[330px]';
+            } else if (isCompareMode) {
+                els.strategyBanner.className = 'bg-gradient-to-r from-blue-950 via-slate-900 to-emerald-950 text-white rounded-2xl p-4 sm:p-5 shadow-md border border-blue-800/60';
+                els.activeStrategyPill.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-amber-400 text-slate-950 shadow-xs';
+                els.comparisonCard.className = 'shrink-0 bg-white/10 backdrop-blur-xs border border-white/15 rounded-xl p-3.5 sm:min-w-[310px]';
+            } else {
+                els.strategyBanner.className = 'bg-gradient-to-r from-blue-950 via-slate-900 to-emerald-950 text-white rounded-2xl p-4 sm:p-5 shadow-md border border-blue-800/60';
+                els.activeStrategyPill.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-400 text-slate-950 shadow-xs';
+                els.comparisonCard.className = 'shrink-0 bg-white/10 backdrop-blur-xs border border-white/15 rounded-xl p-3.5 sm:min-w-[310px]';
+            }
+
+            els.dividendPill.textContent = state.dividendEnabled ? '含 0050 半年配息再投入' : '未含配息再投入';
+
+            const reboundFromBottomPct = (((beRecord.price - bottomPrice) / bottomPrice) * 100).toFixed(1);
+            const stillBelowPeakPct = Math.max(0, ((state.startPrice - beRecord.price) / state.startPrice) * 100).toFixed(1);
+
+            if (isStopDcaMode) {
+                const delayMonths = Math.max(0, activeSim.breakevenMonth - baseSim.breakevenMonth);
+                const lostProfit = Math.max(0, baseSim.recoveryRecord.profit - activeSim.recoveryRecord.profit);
+                els.insightSummaryText.innerHTML = `
+                    <strong class="text-amber-300">⚠️ 恐慌停扣警示：</strong>當 0050 跌幅超過 20% 時停止扣款（共停扣 <strong class="text-rose-200">${pausedMonthsCount} 個月</strong>），導致平均成本停滯在 <strong class="text-rose-200">${fmtDec(lowestAvgCost, 1)} 元</strong> 無法向下攤平！
+                    相較純定期定額，恐慌停扣導致回本時間<strong class="text-amber-300 underline decoration-amber-400 decoration-2 underline-offset-2">延後了 ${delayMonths} 個月（從第 ${baseSim.breakevenMonth} 個月拖延至第 ${activeSim.breakevenMonth} 個月）</strong>，回前高時總獲利<strong class="text-rose-200">少賺了 NT$ ${fmtInt(lostProfit)} 元</strong>！
+                `;
+            } else {
+                els.insightSummaryText.innerHTML = `
+                    在 0050 從 <strong class="text-white">${state.startPrice} 元</strong>下跌 <strong class="text-rose-300">-${state.maxDrop}%</strong>（谷底 <strong class="text-rose-300">${fmtDec(bottomPrice, 1)} 元</strong>）的情境下，透過紀律扣款使平均成本最低降至 <strong class="text-amber-300">${fmtDec(lowestAvgCost, 1)} 元</strong>。
+                    股價僅需從底部反彈 <strong class="text-emerald-300">+${reboundFromBottomPct}%</strong>（距前高仍差 ${stillBelowPeakPct}%），於 <strong class="text-emerald-300 underline decoration-emerald-400 decoration-2 underline-offset-2">第 ${breakevenMonth} 個月</strong>即全數回本！至第 ${state.recoveryMonth} 個月重返前高時，總獲利達 <strong class="text-emerald-300">+NT$ ${fmtInt(recoveryRecord.profit)} (+${fmtDec(recoveryRecord.roiPct, 1)}%)</strong>。
+                `;
+            }
+
+            // 2. 更新雙軌對照卡片（純定期定額 vs 目前選定策略）
+            if (!isCompareMode) {
+                els.compareTag.textContent = '基準對照';
+                els.compareTag.className = 'px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-200 text-[10px]';
+                els.compareBreakevenVal.textContent = `第 ${baseSim.breakevenMonth} 個月回本`;
+                els.compareBreakevenSub.textContent = `比指數回高提前 ${Math.max(0, state.recoveryMonth - baseSim.breakevenMonth)} 個月`;
+                els.compareProfitVal.textContent = `+NT$ ${fmtInt(baseSim.recoveryRecord.profit)}`;
+                els.compareProfitVal.className = 'text-sm sm:text-base font-extrabold text-emerald-400 mt-0.5';
+                els.compareProfitSub.textContent = '切換左側 B~E 比較不同策略效果';
+            } else if (isStopDcaMode) {
+                const delayMonths = activeSim.breakevenMonth - baseSim.breakevenMonth;
+                const lostProfit = activeSim.recoveryRecord.profit - baseSim.recoveryRecord.profit; // 負值
+                els.compareTag.textContent = '⚠️ 停扣代價警示';
+                els.compareTag.className = 'px-1.5 py-0.5 rounded bg-rose-500 text-white text-[10px] font-extrabold';
+                els.compareBreakevenVal.textContent = delayMonths > 0
+                    ? `延後 ${delayMonths} 個月才回本！`
+                    : `第 ${activeSim.breakevenMonth} 個月回本`;
+                els.compareBreakevenSub.textContent = `第 ${activeSim.breakevenMonth} 個月 vs 純定額第 ${baseSim.breakevenMonth} 個月`;
+                els.compareProfitVal.textContent = `-NT$ ${fmtInt(Math.abs(lostProfit))}`;
+                els.compareProfitVal.className = 'text-sm sm:text-base font-extrabold text-rose-300 mt-0.5';
+                els.compareProfitSub.textContent = `回前高總獲利大幅縮水（僅賺 ${fmtInt(activeSim.recoveryRecord.profit)} 元）`;
+            } else {
+                const monthsEarlier = baseSim.breakevenMonth - activeSim.breakevenMonth;
+                const extraProfit = activeSim.recoveryRecord.profit - baseSim.recoveryRecord.profit;
+
+                els.compareTag.textContent = '加碼加速效果';
+                els.compareTag.className = 'px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-200 text-[10px]';
+                if (monthsEarlier > 0) {
+                    els.compareBreakevenVal.textContent = `再提前 ${monthsEarlier} 個月回本！`;
+                } else {
+                    els.compareBreakevenVal.textContent = `第 ${activeSim.breakevenMonth} 個月回本`;
+                }
+                els.compareBreakevenSub.textContent = `第 ${activeSim.breakevenMonth} 個月 vs 純定額第 ${baseSim.breakevenMonth} 個月`;
+
+                const profitSign = extraProfit >= 0 ? '+' : '';
+                els.compareProfitVal.textContent = `${profitSign}NT$ ${fmtInt(extraProfit)}`;
+                els.compareProfitVal.className = 'text-sm sm:text-base font-extrabold text-emerald-400 mt-0.5';
+                els.compareProfitSub.textContent = `回前高總獲利增加（總賺 ${fmtInt(activeSim.recoveryRecord.profit)} 元）`;
+            }
+
+            // 3. 更新四大核心指標 KPI 卡片
+            // KPI 1
+            els.kpiBreakevenMonth.textContent = `第 ${breakevenMonth} 個月`;
+            els.kpiBreakevenPrice.textContent = `(市價 ${fmtDec(beRecord.price, 1)}元)`;
+            const savedMonthsVsIndex = state.recoveryMonth - breakevenMonth;
+            els.kpiBreakevenDiff.textContent = savedMonthsVsIndex > 0
+                ? `⚡ 比大盤回前高提前 ${savedMonthsVsIndex} 個月`
+                : `與大盤同步於第 ${breakevenMonth} 個月回本`;
+
+            // KPI 2
+            const discountFold = Math.round((lowestAvgCost / state.startPrice) * 100);
+            els.kpiLowestAvgCost.textContent = `${fmtDec(lowestAvgCost, 1)} 元`;
+            els.kpiCostDiscount.textContent = `約 ${discountFold} 折`;
+            els.kpiLowestCostMonth.textContent = `第 ${lowestAvgCostMonth} 個月最低`;
+            els.kpiBottomPriceHint.textContent = `谷底 ${fmtDec(bottomPrice, 1)}元`;
+
+            // KPI 3
+            const basePrincipal = state.monthlyAmount * state.recoveryMonth;
+            const principalDiff = recoveryRecord.cumPrincipal - basePrincipal;
+            els.kpiPrincipalTitle.textContent = `3. 第 ${state.recoveryMonth} 月總投入本金`;
+            els.kpiTotalPrincipal.textContent = `NT$ ${fmtInt(recoveryRecord.cumPrincipal)}`;
+            if (principalDiff > 0) {
+                els.kpiBoostExtraInfo.textContent = `含低檔加碼 +${fmtInt(principalDiff)}`;
+            } else if (principalDiff < 0) {
+                els.kpiBoostExtraInfo.textContent = `停扣少投入 -${fmtInt(Math.abs(principalDiff))}`;
+            } else {
+                els.kpiBoostExtraInfo.textContent = `純定期定額累積本金`;
+            }
+            els.kpiTotalSharesHint.textContent = `${fmtDec(recoveryRecord.cumShares, 2)} 股`;
+
+            // KPI 4
+            els.kpiRecoveryTitle.textContent = `4. 第 ${state.recoveryMonth} 月帳面總市值`;
+            els.kpiRecoveryValue.textContent = `NT$ ${fmtInt(recoveryRecord.marketValue)}`;
+            const pSign = recoveryRecord.profit >= 0 ? '+' : '';
+            els.kpiRecoveryProfit.textContent = `${pSign}${fmtInt(recoveryRecord.profit)} (${pSign}${fmtDec(recoveryRecord.roiPct, 1)}%)`;
+
+            // 4. 更新三階段里程碑說明
+            els.milestonePhase1.textContent = `第 1～${state.bottomMonth} 月下跌 -${state.maxDrop}% 至 ${fmtDec(bottomPrice, 1)} 元，低檔累積大量零股`;
+            els.milestonePhase2.textContent = `第 ${breakevenMonth} 個月市價穿越成本線正式回本，比大盤提前 ${Math.max(0, savedMonthsVsIndex)} 個月`;
+            els.milestonePhase3.textContent = `第 ${state.recoveryMonth} 個月 0050 重返 ${state.startPrice} 元，累積報酬率達 +${fmtDec(recoveryRecord.roiPct, 1)}%`;
+
+            // 5. 更新雙軌圖表與明細表
+            renderChart(activeSim, baseSim);
+            renderTable(records);
+        }
+
+        // ==========================================
+        // 4. 繪製 Chart.js 雙視角互動圖表
+        // ==========================================
+        function renderChart(activeSim, baseSim) {
+            const records = activeSim.records;
+            const baseRecords = baseSim.records;
+            const isCompareMode = state.strategy !== 'A';
+            const isStopDcaMode = state.strategy === 'E';
+            const labels = records.map(r => `第${r.month}月`);
+
+            const ctx = document.getElementById('mainSimChart').getContext('2d');
+            if (mainSimChart) {
+                mainSimChart.destroy();
+            }
+
+            if (state.chartTab === 'price') {
+                els.chartTitle.textContent = '微笑曲線成本對照圖：0050 市價 vs. 平均持有成本';
+                if (isStopDcaMode) {
+                    els.chartSubtitle.textContent = '紅色實線為「恐慌停扣平均成本」（低檔停扣期間呈現水平停滯、無法向下攤平），灰色虛線為「純定期定額平均成本」';
+                    els.legendActiveCostLine.className = 'w-3.5 h-1 bg-rose-600 inline-block rounded';
+                    els.legendActiveCostText.textContent = '恐慌停扣平均成本(紅色警示)';
+                    els.legendActiveCostText.className = 'font-bold text-rose-700';
+                } else if (isCompareMode) {
+                    els.chartSubtitle.textContent = '橘色實線為「目前加碼策略平均成本」，灰色虛線為「純定期定額平均成本」，可直觀比較成本下壓幅度';
+                    els.legendActiveCostLine.className = 'w-3.5 h-1 bg-amber-500 inline-block rounded';
+                    els.legendActiveCostText.textContent = '目前策略平均成本';
+                    els.legendActiveCostText.className = 'font-semibold text-slate-700';
+                } else {
+                    els.chartSubtitle.textContent = '藍色實線向上穿越橘色成本線即代表正式回本轉正；切換左側投資策略可開啟雙軌成本對照';
+                    els.legendActiveCostLine.className = 'w-3.5 h-1 bg-amber-500 inline-block rounded';
+                    els.legendActiveCostText.textContent = '目前策略平均成本';
+                    els.legendActiveCostText.className = 'font-semibold text-slate-700';
+                }
+                els.legendPriceMode.classList.remove('hidden');
+                els.legendAssetMode.classList.add('hidden');
+                els.legendBaseCostItem.classList.toggle('hidden', !isCompareMode);
+
+                const activeCostLineColor = isStopDcaMode ? '#e11d48' : '#f59e0b';
+
+                const datasets = [
+                    {
+                        label: '0050 市場股價 (元)',
+                        data: records.map(r => Number(r.price.toFixed(2))),
+                        borderColor: '#1d4ed8',
+                        backgroundColor: 'rgba(29, 78, 216, 0.08)',
+                        borderWidth: 2.8,
+                        fill: true,
+                        tension: 0.25,
+                        pointRadius: records.map(r => r.isBreakevenPoint ? 7 : (r.isBottom || r.isRecovery ? 4.5 : 1.5)),
+                        pointBackgroundColor: records.map(r => r.isBreakevenPoint ? '#10b981' : (r.isBottom ? '#e11d48' : '#1d4ed8')),
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointHoverRadius: 7
+                    },
+                    {
+                        label: isCompareMode ? `${strategyMeta[state.strategy].shortName} 平均成本 (元)` : '平均持有成本 (元)',
+                        data: records.map(r => Number(r.avgCost.toFixed(2))),
+                        borderColor: activeCostLineColor,
+                        backgroundColor: 'transparent',
+                        borderWidth: isStopDcaMode ? 3.2 : 2.8,
+                        tension: 0.15,
+                        pointRadius: 0,
+                        pointHoverRadius: 5
+                    }
+                ];
+
+                // 若切換至 B/C/D/E 任一對照模式，加入「純定期定額平均成本（灰色虛線）」進行雙軌對比
+                if (isCompareMode) {
+                    datasets.push({
+                        label: '純定期定額平均成本 [基準] (元)',
+                        data: baseRecords.map(r => Number(r.avgCost.toFixed(2))),
+                        borderColor: '#64748b',
+                        backgroundColor: 'transparent',
+                        borderWidth: 2,
+                        borderDash: [6, 4],
+                        tension: 0.25,
+                        pointRadius: 0,
+                        pointHoverRadius: 4
+                    });
+                }
+
+                mainSimChart = new Chart(ctx, {
+                    type: 'line',
+                    data: { labels, datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.94)',
+                                padding: 12,
+                                callbacks: {
+                                    afterBody: (items) => {
+                                        const idx = items[0].dataIndex;
+                                        const r = records[idx];
+                                        const lines = [];
+                                        if (r.isBottom) lines.push('📍 股災波段最低點');
+                                        if (r.isBreakevenPoint) lines.push('🎉 黃金交叉：整體資產正式回本轉正！');
+                                        if (r.isRecovery) lines.push('🏁 0050 股價漲回前高點');
+                                        if (r.isPaused) {
+                                            lines.push('🛑 恐慌停扣中（投入 $0，平均成本無法向下攤平）');
+                                        } else if (r.boostLabel) {
+                                            lines.push(`⚡ 本月觸發低檔加碼 (${r.boostLabel})`);
+                                        }
+                                        if (r.dividendShares > 0) lines.push(`💰 半年配息自動再投入 +${fmtDec(r.dividendShares, 2)} 股`);
+                                        lines.push(`累積報酬率：${r.roiPct >= 0 ? '+' : ''}${fmtDec(r.roiPct, 1)}%`);
+                                        return lines;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: { maxTicksLimit: 12, font: { size: 11 }, color: '#64748b' }
+                            },
+                            y: {
+                                grid: { color: '#f1f5f9' },
+                                ticks: {
+                                    font: { size: 11 },
+                                    color: '#64748b',
+                                    callback: (v) => v + ' 元'
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                // 視角二：累積本金與帳面總市值成長圖
+                els.chartTitle.textContent = '累積投入本金 vs. 帳面總市值成長走勢';
+                els.chartSubtitle.textContent = isStopDcaMode
+                    ? '停扣期間本金線呈現水平停滯，因錯過低檔便宜零股，反彈後的市值遠低於藍色虛線（純定期定額總市值）'
+                    : '綠色面積為實際持有 0050 總市值，當綠線超越灰色虛線（累積本金）即進入獲利複利區間';
+                els.legendPriceMode.classList.add('hidden');
+                els.legendAssetMode.classList.remove('hidden');
+                els.legendBaseAssetItem.classList.toggle('hidden', !isCompareMode);
+
+                const datasets = [
+                    {
+                        label: '目前策略帳面總市值 (NT$)',
+                        data: records.map(r => Math.round(r.marketValue)),
+                        borderColor: isStopDcaMode ? '#e11d48' : '#10b981',
+                        backgroundColor: isStopDcaMode ? 'rgba(225, 29, 72, 0.12)' : 'rgba(16, 185, 129, 0.16)',
+                        borderWidth: 2.8,
+                        fill: true,
+                        tension: 0.25,
+                        pointRadius: records.map(r => r.isBreakevenPoint ? 6 : 0),
+                        pointBackgroundColor: '#10b981',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: '目前策略累積本金 (NT$)',
+                        data: records.map(r => Math.round(r.cumPrincipal)),
+                        borderColor: '#475569',
+                        backgroundColor: 'transparent',
+                        borderWidth: 2,
+                        borderDash: [6, 4],
+                        tension: 0.1,
+                        pointRadius: 0,
+                        pointHoverRadius: 5
+                    }
+                ];
+
+                if (isCompareMode) {
+                    datasets.push({
+                        label: '純定期定額總市值 [基準] (NT$)',
+                        data: baseRecords.map(r => Math.round(r.marketValue)),
+                        borderColor: '#2563eb',
+                        backgroundColor: 'transparent',
+                        borderWidth: 2.2,
+                        borderDash: [4, 4],
+                        tension: 0.25,
+                        pointRadius: 0,
+                        pointHoverRadius: 5
+                    });
+                }
+
+                mainSimChart = new Chart(ctx, {
+                    type: 'line',
+                    data: { labels, datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.94)',
+                                padding: 12,
+                                callbacks: {
+                                    label: (ctxItem) => `${ctxItem.dataset.label}: NT$ ${Number(ctxItem.raw).toLocaleString('zh-TW')}`,
+                                    afterBody: (items) => {
+                                        const r = records[items[0].dataIndex];
+                                        const sign = r.profit >= 0 ? '+' : '';
+                                        return [`帳面損益：${sign}NT$ ${fmtInt(r.profit)} (${sign}${fmtDec(r.roiPct, 1)}%)`];
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: { maxTicksLimit: 12, font: { size: 11 }, color: '#64748b' }
+                            },
+                            y: {
+                                grid: { color: '#f1f5f9' },
+                                ticks: {
+                                    font: { size: 11 },
+                                    color: '#64748b',
+                                    callback: (v) => (v / 10000).toFixed(0) + ' 萬'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // ==========================================
+        // 5. 渲染逐月明細表（回本當月綠色高亮 / 停扣月份淡紅警示）與 CSV 匯出
+        // ==========================================
+        function renderTable(records) {
+            els.ledgerBody.innerHTML = records.map(r => {
+                let rowClass = 'hover:bg-slate-50 transition-colors';
+                if (r.isBreakevenPoint) {
+                    rowClass = 'bg-emerald-100/85 hover:bg-emerald-100 font-semibold ring-1 ring-inset ring-emerald-400/60';
+                } else if (r.isPaused) {
+                    rowClass = 'bg-rose-50/80 hover:bg-rose-100/70';
+                } else if (r.isBottom) {
+                    rowClass = 'bg-rose-50/60 hover:bg-rose-50';
+                } else if (r.isRecovery) {
+                    rowClass = 'bg-blue-50/70 hover:bg-blue-50';
+                }
+
+                let statusBadge = '';
+                if (r.isBreakevenPoint) {
+                    statusBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-600 text-white shadow-xs">🎉 正式回本</span>`;
+                } else if (r.isRecovery) {
+                    statusBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-900 text-white">漲回前高</span>`;
+                } else if (r.isPaused) {
+                    statusBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-300">🛑 恐慌停扣</span>`;
+                } else if (r.isProfitable) {
+                    statusBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">已回本獲利</span>`;
+                } else {
+                    statusBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600">低檔攤平</span>`;
+                }
+
+                let monthText = `第 ${r.month} 月`;
+                if (r.isBottom) monthText += ` <span class="text-[10px] font-bold text-rose-600 bg-rose-100 px-1 rounded">谷底</span>`;
+
+                const investedCellHtml = r.isPaused
+                    ? `<span class="font-extrabold text-rose-700">$0</span> <span class="ml-1 text-[10px] font-extrabold text-rose-800 bg-rose-200/80 px-1.5 py-0.5 rounded">跌逾20%停扣</span>`
+                    : `${fmtInt(r.investedThisMonth)}${r.boostLabel ? `<span class="ml-1 text-[10px] font-extrabold text-amber-800 bg-amber-200/80 px-1 rounded">${r.boostLabel}</span>` : ''}`;
+
+                const roiClass = r.roiPct >= 0 ? 'text-emerald-600 font-extrabold' : 'text-rose-600 font-semibold';
+                const roiSign = r.roiPct >= 0 ? '+' : '';
+
+                return `
+                    <tr class="${rowClass}">
+                        <td class="py-2.5 px-3.5 whitespace-nowrap text-slate-800">${monthText}</td>
+                        <td class="py-2.5 px-3.5 whitespace-nowrap text-right font-bold text-slate-800">${fmtDec(r.price, 2)} 元</td>
+                        <td class="py-2.5 px-3.5 whitespace-nowrap text-right text-slate-500">${r.drawdownPct >= 0 ? '+' : ''}${fmtDec(r.drawdownPct, 1)}%</td>
+                        <td class="py-2.5 px-3.5 whitespace-nowrap text-right text-slate-700">${investedCellHtml}</td>
+                        <td class="py-2.5 px-3.5 whitespace-nowrap text-right ${r.isPaused ? 'text-rose-500 font-semibold' : 'text-slate-600'}">${fmtDec(r.sharesBought, 2)}</td>
+                        <td class="py-2.5 px-3.5 whitespace-nowrap text-right text-emerald-700 font-medium">${r.dividendShares > 0 ? '+' + fmtDec(r.dividendShares, 2) : '-'}</td>
+                        <td class="py-2.5 px-3.5 whitespace-nowrap text-right font-semibold text-slate-800">${fmtDec(r.cumShares, 2)}</td>
+                        <td class="py-2.5 px-3.5 whitespace-nowrap text-right font-extrabold ${state.strategy === 'E' ? 'text-rose-600' : 'text-amber-600'}">${fmtDec(r.avgCost, 2)} 元</td>
+                        <td class="py-2.5 px-3.5 whitespace-nowrap text-right text-slate-600">${fmtInt(r.cumPrincipal)}</td>
+                        <td class="py-2.5 px-3.5 whitespace-nowrap text-right font-extrabold text-slate-900">${fmtInt(r.marketValue)}</td>
+                        <td class="py-2.5 px-3.5 whitespace-nowrap text-right ${roiClass}">${roiSign}${fmtDec(r.roiPct, 1)}%</td>
+                        <td class="py-2.5 px-3.5 whitespace-nowrap text-center">${statusBadge}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function exportToCsv() {
+            if (!lastActiveRecords.length) return;
+            const headers = ['月份', '0050市價(元)', '距前高跌幅(%)', '當月投入(元)', '買進零股(股)', '配息再投入(股)', '累積總股數(股)', '平均成本(元)', '累積本金(元)', '帳面總市值(元)', '累積報酬率(%)', '狀態'];
+            const rows = lastActiveRecords.map(r => [
+                `第${r.month}月`,
+                r.price.toFixed(2),
+                r.drawdownPct.toFixed(1),
+                Math.round(r.investedThisMonth),
+                r.sharesBought.toFixed(2),
+                r.dividendShares.toFixed(2),
+                r.cumShares.toFixed(2),
+                r.avgCost.toFixed(2),
+                Math.round(r.cumPrincipal),
+                Math.round(r.marketValue),
+                r.roiPct.toFixed(1),
+                r.isBreakevenPoint ? '正式回本' : (r.isProfitable ? '已回本獲利' : '低檔攤平')
+            ]);
+
+            const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `台股0050_股災定期定額模擬_策略${state.strategy}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // ==========================================
+        // 6. 事件監聽與控制項同步
+        // ==========================================
+        function syncControls() {
+            els.startPriceSlider.value = Math.min(250, Math.max(30, state.startPrice));
+            els.startPrice.value = state.startPrice;
+
+            // 高亮股價快捷鈕
+            if (state.startPrice === 200) {
+                els.presetPrice200.className = 'px-2 py-0.5 text-[11px] font-bold rounded bg-blue-900 text-white transition';
+                els.presetPrice45.className = 'px-2 py-0.5 text-[11px] font-bold rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
+            } else if (state.startPrice === 45) {
+                els.presetPrice200.className = 'px-2 py-0.5 text-[11px] font-bold rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
+                els.presetPrice45.className = 'px-2 py-0.5 text-[11px] font-bold rounded bg-blue-900 text-white transition';
+            } else {
+                els.presetPrice200.className = 'px-2 py-0.5 text-[11px] font-bold rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
+                els.presetPrice45.className = 'px-2 py-0.5 text-[11px] font-bold rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
+            }
+
+            els.monthlyAmount.value = state.monthlyAmount;
+            els.monthlyAmountInput.value = state.monthlyAmount;
+
+            els.maxDrop.value = state.maxDrop;
+            els.maxDropVal.textContent = `-${state.maxDrop}%`;
+
+            els.bottomMonth.value = state.bottomMonth;
+            els.bottomMonthVal.textContent = `第 ${state.bottomMonth} 個月`;
+
+            els.recoveryMonth.value = state.recoveryMonth;
+            els.recoveryMonthVal.textContent = `第 ${state.recoveryMonth} 個月 (${(state.recoveryMonth / 12).toFixed(1)}年)`;
+
+            els.dividendToggle.checked = state.dividendEnabled;
+
+            // 同步策略單選框樣式
+            document.querySelectorAll('input[name="dcaStrategy"]').forEach(radio => {
+                radio.checked = (radio.value === state.strategy);
+                const labelEl = radio.closest('.strategy-option');
+                const isWarningCard = radio.value === 'E';
+                if (isWarningCard) {
+                    labelEl.className = radio.checked
+                        ? 'strategy-option strategy-warning flex items-start gap-2.5 p-2 rounded-lg border-2 border-rose-600 bg-rose-50 shadow-xs cursor-pointer transition'
+                        : 'strategy-option strategy-warning flex items-start gap-2.5 p-2 rounded-lg border border-rose-300 bg-rose-50/70 hover:border-rose-500 cursor-pointer transition';
+                } else if (radio.checked) {
+                    labelEl.className = 'strategy-option flex items-start gap-2.5 p-2 rounded-lg border-2 border-amber-600 bg-white shadow-xs cursor-pointer transition';
+                } else {
+                    labelEl.className = 'strategy-option flex items-start gap-2.5 p-2 rounded-lg border border-slate-200 bg-white hover:border-amber-400 cursor-pointer transition';
+                }
+            });
+        }
+
+        function setActivePresetButton(presetKey) {
+            state.activePreset = presetKey;
+            document.querySelectorAll('.preset-btn').forEach(b => {
+                const isMatch = b.dataset.preset === presetKey;
+                if (isMatch) {
+                    b.className = 'preset-btn text-left p-2.5 rounded-xl border-2 border-blue-900 bg-white shadow-xs transition';
+                    b.querySelector('div:first-child').className = 'text-xs font-extrabold text-blue-950';
+                    b.querySelector('div:last-child').className = 'text-[11px] text-blue-700 mt-0.5';
+                } else {
+                    b.className = 'preset-btn text-left p-2.5 rounded-xl border border-slate-200 bg-white hover:border-blue-500 transition';
+                    b.querySelector('div:first-child').className = 'text-xs font-bold text-slate-800';
+                    b.querySelector('div:last-child').className = 'text-[11px] text-slate-500 mt-0.5';
+                }
+            });
+            if (presetDescriptions[presetKey]) {
+                els.presetHistoryNote.innerHTML = presetDescriptions[presetKey];
+            }
+        }
+
+        // 歷史股災一鍵套用事件
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const preset = btn.dataset.preset;
+                setActivePresetButton(preset);
+
+                if (preset === 'covid2020') {
+                    state.maxDrop = 34;
+                    state.bottomMonth = 2;
+                    state.recoveryMonth = 5;
+                } else if (preset === 'bear2022') {
+                    state.maxDrop = 25;
+                    state.bottomMonth = 9;
+                    state.recoveryMonth = 24;
+                } else if (preset === 'gfc2008') {
+                    state.maxDrop = 57;
+                    state.bottomMonth = 17;
+                    state.recoveryMonth = 65;
+                } else {
+                    state.maxDrop = 30;
+                    state.bottomMonth = 8;
+                    state.recoveryMonth = 24;
+                }
+                syncControls();
+                updateDashboard();
+            });
+        });
+
+        // 加碼投資策略切換事件
+        document.querySelectorAll('input[name="dcaStrategy"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                state.strategy = e.target.value;
+                syncControls();
+                updateDashboard();
+            });
+        });
+
+        // 0050 股價控制
+        els.startPriceSlider.addEventListener('input', (e) => {
+            state.startPrice = Number(e.target.value);
+            syncControls();
+            updateDashboard();
+        });
+        els.startPrice.addEventListener('change', (e) => {
+            let val = Number(e.target.value);
+            if (isNaN(val) || val < 10) val = 10;
+            if (val > 500) val = 500;
+            state.startPrice = val;
+            syncControls();
+            updateDashboard();
+        });
+        els.presetPrice200.addEventListener('click', () => {
+            state.startPrice = 200;
+            syncControls();
+            updateDashboard();
+        });
+        els.presetPrice45.addEventListener('click', () => {
+            state.startPrice = 45;
+            syncControls();
+            updateDashboard();
+        });
+
+        // 每月定期定額金額控制
+        els.monthlyAmount.addEventListener('input', (e) => {
+            state.monthlyAmount = Number(e.target.value);
+            syncControls();
+            updateDashboard();
+        });
+        els.monthlyAmountInput.addEventListener('change', (e) => {
+            let val = Number(e.target.value);
+            if (isNaN(val) || val < 3000) val = 3000;
+            if (val > 100000) val = 100000;
+            state.monthlyAmount = val;
+            syncControls();
+            updateDashboard();
+        });
+
+        // 股災幅度與時間軸控制
+        els.maxDrop.addEventListener('input', (e) => {
+            state.maxDrop = Number(e.target.value);
+            syncControls();
+            updateDashboard();
+        });
+        els.bottomMonth.addEventListener('input', (e) => {
+            state.bottomMonth = Number(e.target.value);
+            if (state.recoveryMonth <= state.bottomMonth + 1) {
+                state.recoveryMonth = Math.min(72, state.bottomMonth + 2);
+            }
+            syncControls();
+            updateDashboard();
+        });
+        els.recoveryMonth.addEventListener('input', (e) => {
+            let val = Number(e.target.value);
+            if (val <= state.bottomMonth + 1) {
+                val = state.bottomMonth + 2;
+            }
+            state.recoveryMonth = val;
+            syncControls();
+            updateDashboard();
+        });
+
+        // 配息再投入開關
+        els.dividendToggle.addEventListener('change', (e) => {
+            state.dividendEnabled = e.target.checked;
+            updateDashboard();
+        });
+
+        // 圖表雙視角切換
+        els.tabChartPrice.addEventListener('click', () => {
+            state.chartTab = 'price';
+            els.tabChartPrice.className = 'px-3 py-1.5 text-xs font-bold rounded-lg bg-blue-950 text-white shadow-xs transition';
+            els.tabChartAsset.className = 'px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 hover:text-slate-900 transition';
+            updateDashboard();
+        });
+        els.tabChartAsset.addEventListener('click', () => {
+            state.chartTab = 'asset';
+            els.tabChartAsset.className = 'px-3 py-1.5 text-xs font-bold rounded-lg bg-blue-950 text-white shadow-xs transition';
+            els.tabChartPrice.className = 'px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 hover:text-slate-900 transition';
+            updateDashboard();
+        });
+
+        // CSV 匯出與明細收合
+        els.exportCsvBtn.addEventListener('click', exportToCsv);
+
+        let isTableOpen = true;
+        els.toggleTableBtn.addEventListener('click', () => {
+            isTableOpen = !isTableOpen;
+            els.tableContainer.classList.toggle('hidden', !isTableOpen);
+            els.toggleTableText.textContent = isTableOpen ? '收合明細' : '展開明細';
+            els.toggleTableIcon.style.transform = isTableOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+        });
+
+        // 重設按鈕
+        els.resetBtn.addEventListener('click', () => {
+            state.startPrice = 200;
+            state.maxDrop = 30;
+            state.bottomMonth = 8;
+            state.recoveryMonth = 24;
+            state.monthlyAmount = 10000;
+            state.strategy = 'A';
+            state.dividendEnabled = true;
+            setActivePresetButton('default');
+            syncControls();
+            updateDashboard();
+        });
+
+        // 初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            setActivePresetButton('default');
+            syncControls();
+            updateDashboard();
+        });
+    </script>
+</body>
+</html>
